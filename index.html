@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-  <title>NEXEDIT · Editor Profesional</title>
+  <title>NEXEDIT · Editor de Archivos</title>
   <!-- Monaco Editor -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/min/vs/editor/editor.main.css" />
   <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/min/vs/loader.js"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    /* ----- RESET PROFESIONAL OSCURO ----- */
+    /* ----- RESET ----- */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
     }
     body {
       background: #1e1e1e;
@@ -23,85 +23,15 @@
       overflow: hidden;
       color: #d4d4d4;
     }
-    /* ----- SPLASH / INICIO ----- */
-    .splash {
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      background: linear-gradient(135deg, #1e1e1e 0%, #252526 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-    }
-    .splash-content {
-      text-align: center;
-      padding: 32px;
-      animation: fadeIn 0.5s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .splash-content h1 {
-      font-size: 56px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #007acc 0%, #00b4d8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 12px;
-      letter-spacing: -0.02em;
-    }
-    .subtitle {
-      color: #a0a0a0;
-      margin-bottom: 32px;
-      font-size: 16px;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, #007acc 0%, #005fa3 100%);
-      color: white;
-      border: none;
-      padding: 14px 36px;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 4px 15px rgba(0,122,204,0.3);
-    }
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0,122,204,0.4);
-    }
-    .btn-secondary {
-      background: transparent;
-      color: #d4d4d4;
-      border: 1px solid #555;
-      padding: 10px 24px;
-      border-radius: 6px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-top: 12px;
-    }
-    .btn-secondary:hover {
-      background: #3e3e3e;
-      border-color: #777;
-    }
-    /* ----- APLICACIÓN PRINCIPAL ----- */
+    
+    /* ----- APP LAYOUT ----- */
     .app {
       display: grid;
       grid-template-rows: 52px 1fr;
       height: 100vh;
       width: 100vw;
-      background: #1e1e1e;
     }
-    .hidden {
-      display: none !important;
-    }
+    
     /* ----- TOPBAR ----- */
     .topbar {
       background: #2d2d2d;
@@ -114,54 +44,71 @@
     .topbar-left {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-weight: 500;
+      gap: 12px;
     }
-    .logo-icon {
+    .hamburger-btn {
+      background: transparent;
+      border: none;
+      color: #d4d4d4;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .hamburger-btn:hover {
+      background: #3e3e3e;
+      color: white;
+    }
+    .hamburger-btn i {
+      width: 24px;
+      height: 24px;
+    }
+    .app-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .app-title i {
       color: #007acc;
       width: 20px;
       height: 20px;
     }
-    .app-name {
-      font-size: 15px;
-      color: white;
-    }
-    .mode-badge {
-      font-size: 11px;
-      color: #8a8a8a;
-      margin-left: 8px;
-      padding: 2px 8px;
-      background: #3a3a3a;
-      border-radius: 12px;
-      border: 1px solid #444;
-    }
+    
     .topbar-center {
-      display: flex;
-      align-items: center;
-      gap: 4px;
       flex: 1;
+      display: flex;
       justify-content: center;
       max-width: 400px;
       margin: 0 16px;
     }
-    .search-box {
-      background: #3c3c3c;
-      border: 1px solid #555;
+    .filename-display {
+      background: #1e1e1e;
+      border: 1px solid #444;
       border-radius: 4px;
-      padding: 6px 12px;
+      padding: 6px 16px;
       color: #ccc;
       font-size: 13px;
-      width: 100%;
-      outline: none;
-      transition: all 0.2s;
+      min-width: 200px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .search-box:focus {
-      border-color: #007acc;
-      background: #3e3e3e;
+    .filename-display.empty {
+      color: #666;
+      font-style: italic;
     }
-    .search-box::placeholder {
-      color: #888;
+    .filename-display.dirty::after {
+      content: " ●";
+      color: #ff9800;
     }
+    
     .topbar-right {
       display: flex;
       gap: 8px;
@@ -173,7 +120,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 14px;
+      padding: 8px 16px;
       border-radius: 4px;
       font-size: 13px;
       cursor: pointer;
@@ -182,48 +129,147 @@
     .btn:hover {
       background: #3e3e3e;
     }
-    .btn.dirty {
-      color: #ff9800;
+    .btn.primary {
+      background: #007acc;
+      color: white;
+    }
+    .btn.primary:hover {
+      background: #005fa3;
     }
     .btn i {
       width: 16px;
       height: 16px;
     }
-    /* ----- WORKSPACE: SIDEBAR + EDITOR ----- */
-    .workspace {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      overflow: hidden;
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
-    @media (max-width: 768px) {
-      .workspace { grid-template-columns: 1fr; }
-      .sidebar { display: none; }
+    
+    /* ----- SIDEBAR (DRAWER) ----- */
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
     }
-    /* ----- SIDEBAR ----- */
+    .sidebar-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
     .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 320px;
+      height: 100vh;
       background: #252526;
       border-right: 1px solid #333;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1001;
       display: grid;
       grid-template-rows: auto 1fr auto;
-      overflow: hidden;
+    }
+    .sidebar.open {
+      transform: translateX(0);
     }
     .sidebar-header {
-      padding: 12px 16px;
+      padding: 16px;
       border-bottom: 1px solid #333;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
     .sidebar-title {
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 600;
-      color: #888;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .sidebar-actions {
+    .close-sidebar {
+      background: transparent;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    .close-sidebar:hover {
+      color: white;
+      background: #3e3e3e;
+    }
+    
+    .sidebar-content {
+      overflow-y: auto;
+      padding: 16px;
+    }
+    .file-list {
+      list-style: none;
+    }
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-bottom: 4px;
+      border: 1px solid transparent;
+    }
+    .file-item:hover {
+      background: #2a2d2e;
+      border-color: #444;
+    }
+    .file-item.active {
+      background: #094771;
+      border-color: #007acc;
+      color: white;
+    }
+    .file-item i {
+      width: 18px;
+      height: 18px;
+      color: #dcb67a;
+      flex-shrink: 0;
+    }
+    .file-item.active i {
+      color: white;
+    }
+    .file-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .file-name {
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .file-meta {
+      font-size: 11px;
+      color: #888;
+      margin-top: 2px;
+    }
+    .file-item.active .file-meta {
+      color: #aaa;
+    }
+    .file-actions {
       display: flex;
       gap: 4px;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .file-item:hover .file-actions {
+      opacity: 1;
     }
     .icon-btn {
       background: transparent;
@@ -235,172 +281,117 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.15s;
     }
     .icon-btn:hover {
-      background: #3e3e3e;
-      color: #fff;
+      background: #ff4444;
+      color: white;
     }
     .icon-btn i {
       width: 14px;
       height: 14px;
     }
-    .sidebar-content {
-      overflow-y: auto;
-      padding: 8px 0;
-      font-size: 13px;
-    }
-    .tree, .tree ul {
-      list-style: none;
-      padding-left: 0;
-    }
-    .tree ul {
-      padding-left: 16px;
-      border-left: 1px solid #333;
-      margin-left: 8px;
-    }
-    .tree-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 0 8px 0 4px;
-      min-height: 26px;
-      border-radius: 4px;
-      cursor: pointer;
-      color: #ccc;
-      transition: all 0.1s;
-      white-space: nowrap;
-      margin: 1px 4px;
-    }
-    .tree-item:hover {
-      background: #2a2d2e;
-    }
-    .tree-item.active {
-      background: #094771;
-      color: white;
-    }
-    .tree-item.drag-over {
-      background: #1e3a5f;
-      border: 1px dashed #007acc;
-    }
-    .tree-item i {
-      width: 16px;
-      height: 16px;
-      flex-shrink: 0;
-      color: #858585;
-    }
-    .tree-item.active i {
-      color: white;
-    }
-    .expand-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 18px;
-      height: 18px;
-      color: #858585;
-      cursor: pointer;
-      border-radius: 3px;
-      transition: transform 0.2s;
-    }
-    .expand-icon:hover {
-      background: #3e3e3e;
-    }
-    .expand-icon.expanded {
-      transform: rotate(90deg);
-    }
-    .file-name {
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .tree-item .file-icon {
-      color: #dcb67a;
-    }
-    .tree-item .folder-icon {
-      color: #dcb67a;
-    }
-    .sidebar-footer {
-      padding: 8px 16px;
-      border-top: 1px solid #333;
-      font-size: 11px;
+    
+    .empty-files {
+      text-align: center;
+      padding: 40px 20px;
       color: #666;
+    }
+    .empty-files i {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+    .empty-files p {
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+    
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid #333;
       display: flex;
-      justify-content: space-between;
-    }
-    /* ----- EDITOR AREA ----- */
-    .editor-area {
-      display: grid;
-      grid-template-rows: 36px 1fr;
-      background: #1e1e1e;
-      overflow: hidden;
-    }
-    /* TABS */
-    .tabs {
-      display: flex;
-      background: #252526;
-      border-bottom: 1px solid #333;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-    .tabs::-webkit-scrollbar {
-      display: none;
-    }
-    .tab {
-      display: flex;
-      align-items: center;
+      flex-direction: column;
       gap: 8px;
-      padding: 0 12px;
-      background: #2d2d2d;
-      border-right: 1px solid #252526;
-      color: #969696;
-      font-size: 12px;
-      height: 36px;
+    }
+    .add-file-btn {
+      width: 100%;
+      background: #007acc;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 13px;
       cursor: pointer;
-      white-space: nowrap;
-      min-width: 120px;
-      max-width: 200px;
-      transition: all 0.15s;
-      position: relative;
-    }
-    .tab:hover {
-      background: #2a2d2e;
-    }
-    .tab.active {
-      background: #1e1e1e;
-      color: #fff;
-      border-top: 2px solid #007acc;
-    }
-    .tab.dirty .tab-label::after {
-      content: " ●";
-      color: #ff9800;
-      font-size: 10px;
-    }
-    .tab-close {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 18px;
-      height: 18px;
-      border-radius: 3px;
-      opacity: 0;
-      transition: all 0.15s;
+      gap: 8px;
+      transition: all 0.2s;
     }
-    .tab:hover .tab-close {
-      opacity: 1;
+    .add-file-btn:hover {
+      background: #005fa3;
     }
-    .tab-close:hover {
-      background: #4a4a4a;
+    .file-count {
+      text-align: center;
+      font-size: 12px;
+      color: #666;
     }
-    .tab-close i {
-      width: 12px;
-      height: 12px;
-    }
-    #editor-container {
+    
+    /* ----- EDITOR AREA ----- */
+    .editor-container {
       width: 100%;
       height: 100%;
       background: #1e1e1e;
+      position: relative;
     }
+    .empty-state {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      text-align: center;
+      padding: 40px;
+    }
+    .empty-state i {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 24px;
+      opacity: 0.3;
+    }
+    .empty-state h2 {
+      font-size: 24px;
+      color: #888;
+      margin-bottom: 12px;
+      font-weight: 400;
+    }
+    .empty-state p {
+      font-size: 14px;
+      max-width: 300px;
+      line-height: 1.6;
+    }
+    .empty-state .hint {
+      margin-top: 24px;
+      padding: 12px 20px;
+      background: #2d2d2d;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #888;
+    }
+    .empty-state kbd {
+      background: #3c3c3c;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      color: #ccc;
+    }
+    
     /* ----- TOAST ----- */
     .toast {
       position: fixed;
@@ -413,12 +404,12 @@
       font-size: 14px;
       color: #e0e0e0;
       box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-      z-index: 3000;
-      animation: slideIn 0.3s ease;
+      z-index: 2000;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
     }
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+    .toast.show {
+      transform: translateX(0);
     }
     .toast.error {
       border-left-color: #f44336;
@@ -426,736 +417,287 @@
     .toast.success {
       border-left-color: #4caf50;
     }
-    /* ----- BREADCRUMBS ----- */
-    .breadcrumbs {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      padding: 0 12px;
-      height: 24px;
-      background: #1e1e1e;
-      border-bottom: 1px solid #333;
-      font-size: 12px;
-      color: #888;
-      overflow-x: auto;
+    
+    /* ----- SCROLLBAR ----- */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
     }
-    .breadcrumb-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      cursor: pointer;
-      padding: 2px 6px;
-      border-radius: 3px;
-      transition: all 0.15s;
+    ::-webkit-scrollbar-track {
+      background: transparent;
     }
-    .breadcrumb-item:hover {
-      background: #3e3e3e;
-      color: #ccc;
+    ::-webkit-scrollbar-thumb {
+      background: #424242;
+      border-radius: 5px;
     }
-    .breadcrumb-separator {
-      color: #555;
-    }
-    /* ----- CONTEXT MENU ----- */
-    .context-menu {
-      position: fixed;
-      background: #2d2d2d;
-      border: 1px solid #444;
-      border-radius: 6px;
-      padding: 4px 0;
-      min-width: 160px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-      z-index: 4000;
-      display: none;
-    }
-    .context-menu-item {
-      padding: 8px 16px;
-      font-size: 13px;
-      color: #ccc;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.15s;
-    }
-    .context-menu-item:hover {
-      background: #094771;
-      color: white;
-    }
-    .context-menu-item i {
-      width: 14px;
-      height: 14px;
-    }
-    .context-menu-divider {
-      height: 1px;
-      background: #444;
-      margin: 4px 0;
-    }
-    /* ----- STATUS BAR ----- */
-    .status-bar {
-      position: fixed;
-      bottom: 0;
-      left: 280px;
-      right: 0;
-      height: 24px;
-      background: #007acc;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 12px;
-      font-size: 12px;
-      z-index: 100;
-    }
-    @media (max-width: 768px) {
-      .status-bar { left: 0; }
-    }
-    .status-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    /* ----- EMPTY STATE ----- */
-    .empty-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      color: #666;
-      text-align: center;
-      padding: 40px;
-    }
-    .empty-state i {
-      width: 64px;
-      height: 64px;
-      margin-bottom: 16px;
-      color: #444;
-    }
-    .empty-state h3 {
-      font-size: 18px;
-      color: #888;
-      margin-bottom: 8px;
-    }
-    .empty-state p {
-      font-size: 14px;
-      max-width: 300px;
-    }
-    .empty-state kbd {
-      background: #3c3c3c;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-family: monospace;
-      font-size: 12px;
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4f4f4f;
     }
   </style>
 </head>
 <body>
-  <!-- SPLASH SCREEN -->
-  <div id="splash-screen" class="splash">
-    <div class="splash-content">
-      <h1>NEXEDIT</h1>
-      <p class="subtitle">Editor de código profesional con soporte nativo de archivos</p>
-      <button id="splash-open-folder" class="btn-primary">
-        <i data-lucide="folder-open"></i> Abrir carpeta
-      </button>
-      <br>
-      <button id="recent-folders-btn" class="btn-secondary hidden">
-        <i data-lucide="history"></i> Carpetas recientes
-      </button>
-      <p id="mode-hint" style="margin-top: 24px; font-size: 13px; color: #8a8a8a;"></p>
-    </div>
-  </div>
-
-  <!-- APLICACIÓN PRINCIPAL -->
-  <div id="app" class="app hidden">
+  <div class="app">
+    <!-- TOPBAR -->
     <header class="topbar">
       <div class="topbar-left">
-        <i data-lucide="code-2" class="logo-icon"></i>
-        <span class="app-name">NEXEDIT</span>
-        <span id="mode-badge" class="mode-badge"></span>
+        <button class="hamburger-btn" id="hamburger-btn" title="Archivos">
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="app-title">
+          <i data-lucide="code-2"></i>
+          <span>NEXEDIT</span>
+        </div>
       </div>
+      
       <div class="topbar-center">
-        <input type="text" id="global-search" class="search-box" placeholder="Buscar archivos... (Ctrl+P)">
+        <div class="filename-display empty" id="filename-display">
+          Ningún archivo abierto
+        </div>
       </div>
+      
       <div class="topbar-right">
-        <button id="save-btn" class="btn" title="Guardar (Ctrl+S)">
+        <button class="btn" id="save-btn" title="Guardar (Ctrl+S)" disabled>
           <i data-lucide="save"></i>
+          <span>Guardar</span>
         </button>
-        <button id="close-file-btn" class="btn" title="Cerrar archivo (Ctrl+W)">
-          <i data-lucide="x"></i>
-        </button>
-        <button id="open-folder-btn" class="btn" title="Abrir otra carpeta">
-          <i data-lucide="folder-open"></i>
+        <button class="btn primary" id="new-file-btn" title="Nuevo archivo">
+          <i data-lucide="plus"></i>
+          <span>Nuevo</span>
         </button>
       </div>
     </header>
-
-    <div class="workspace">
-      <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-          <span class="sidebar-title">EXPLORADOR</span>
-          <div class="sidebar-actions">
-            <button class="icon-btn" id="collapse-all-btn" title="Colapsar todo">
-              <i data-lucide="collapse"></i>
-            </button>
-            <button class="icon-btn" id="refresh-btn" title="Refrescar">
-              <i data-lucide="refresh-cw"></i>
-            </button>
-          </div>
+    
+    <!-- SIDEBAR (DRAWER) -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">
+          <i data-lucide="folder-open"></i>
+          <span>Archivos</span>
         </div>
-        <div class="sidebar-content" id="sidebar-content">
-          <!-- Árbol generado dinámicamente -->
-        </div>
-        <div class="sidebar-footer">
-          <span id="file-count">0 archivos</span>
-          <span id="unsaved-indicator"></span>
-        </div>
-      </aside>
+        <button class="close-sidebar" id="close-sidebar">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
       
-      <main class="editor-area">
-        <div class="tabs" id="tabs-container"></div>
-        <div class="breadcrumbs hidden" id="breadcrumbs"></div>
-        <div id="editor-container">
-          <div class="empty-state">
-            <i data-lucide="file-code"></i>
-            <h3>No hay archivos abiertos</h3>
-            <p>Haz clic en un archivo del explorador o usa <kbd>Ctrl+O</kbd> para abrir una carpeta</p>
-          </div>
+      <div class="sidebar-content" id="sidebar-content">
+        <div class="empty-files" id="empty-files">
+          <i data-lucide="file-x"></i>
+          <p>No hay archivos</p>
+          <button class="add-file-btn" onclick="document.getElementById('file-input').click()">
+            <i data-lucide="plus"></i>
+            Agregar archivo
+          </button>
         </div>
-      </main>
-    </div>
+        <ul class="file-list hidden" id="file-list"></ul>
+      </div>
+      
+      <div class="sidebar-footer">
+        <button class="add-file-btn" onclick="document.getElementById('file-input').click()">
+          <i data-lucide="file-plus"></i>
+          Agregar archivo
+        </button>
+        <div class="file-count" id="file-count">0 archivos</div>
+      </div>
+    </aside>
+    
+    <!-- EDITOR -->
+    <main class="editor-container" id="editor-container">
+      <div class="empty-state" id="empty-state">
+        <i data-lucide="file-code"></i>
+        <h2>Bienvenido a NEXEDIT</h2>
+        <p>Selecciona archivos para editar usando el menú lateral o el botón "Nuevo"</p>
+        <div class="hint">
+          <kbd>☰</kbd> para abrir archivos &nbsp;•&nbsp; <kbd>Ctrl+S</kbd> para guardar
+        </div>
+      </div>
+    </main>
   </div>
-
+  
   <!-- INPUTS OCULTOS -->
-  <input type="file" id="folder-picker" webkitdirectory style="display: none;" />
-  <input type="file" id="file-picker" style="display: none;" />
-
-  <!-- CONTEXT MENU -->
-  <div id="context-menu" class="context-menu">
-    <div class="context-menu-item" id="ctx-rename">
-      <i data-lucide="edit-2"></i> Renombrar
-    </div>
-    <div class="context-menu-item" id="ctx-delete">
-      <i data-lucide="trash-2"></i> Eliminar
-    </div>
-    <div class="context-menu-divider"></div>
-    <div class="context-menu-item" id="ctx-new-file">
-      <i data-lucide="file-plus"></i> Nuevo archivo
-    </div>
-    <div class="context-menu-item" id="ctx-new-folder">
-      <i data-lucide="folder-plus"></i> Nueva carpeta
-    </div>
-  </div>
-
+  <input type="file" id="file-input" accept=".txt,.js,.ts,.html,.css,.json,.md,.py,.java,.cpp,.c,.h,.php,.rb,.go,.rs,.sql,.xml,.yml,.yaml,.env,.ini,.cfg,.log" style="display: none;" multiple>
+  
   <!-- TOAST -->
-  <div id="toast" class="toast hidden"></div>
+  <div id="toast" class="toast"></div>
 
   <script>
     (async function() {
-      // ------------------------------------------------------------
-      // 1. INICIALIZAR MONACO
-      // ------------------------------------------------------------
+      // Inicializar Monaco
       await new Promise((resolve) => {
         require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/min/vs' } });
         require(['vs/editor/editor.main'], () => resolve());
       });
 
-      // ------------------------------------------------------------
-      // 2. ELEMENTOS DOM
-      // ------------------------------------------------------------
-      const splash = document.getElementById('splash-screen');
-      const appEl = document.getElementById('app');
+      // Elementos DOM
+      const hamburgerBtn = document.getElementById('hamburger-btn');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebar-overlay');
+      const closeSidebar = document.getElementById('close-sidebar');
+      const fileInput = document.getElementById('file-input');
+      const fileList = document.getElementById('file-list');
+      const emptyFiles = document.getElementById('empty-files');
       const sidebarContent = document.getElementById('sidebar-content');
-      const tabsContainer = document.getElementById('tabs-container');
-      const editorContainer = document.getElementById('editor-container');
-      const breadcrumbs = document.getElementById('breadcrumbs');
-      const folderPicker = document.getElementById('folder-picker');
-      const filePicker = document.getElementById('file-picker');
+      const filenameDisplay = document.getElementById('filename-display');
       const saveBtn = document.getElementById('save-btn');
-      const closeFileBtn = document.getElementById('close-file-btn');
-      const openFolderBtn = document.getElementById('open-folder-btn');
-      const splashOpenBtn = document.getElementById('splash-open-folder');
-      const recentFoldersBtn = document.getElementById('recent-folders-btn');
-      const collapseAllBtn = document.getElementById('collapse-all-btn');
-      const refreshBtn = document.getElementById('refresh-btn');
-      const globalSearch = document.getElementById('global-search');
-      const modeBadge = document.getElementById('mode-badge');
-      const modeHint = document.getElementById('mode-hint');
-      const toast = document.getElementById('toast');
+      const newFileBtn = document.getElementById('new-file-btn');
+      const editorContainer = document.getElementById('editor-container');
+      const emptyState = document.getElementById('empty-state');
       const fileCount = document.getElementById('file-count');
-      const unsavedIndicator = document.getElementById('unsaved-indicator');
-      const contextMenu = document.getElementById('context-menu');
+      const toast = document.getElementById('toast');
 
-      // ------------------------------------------------------------
-      // 3. ESTADO GLOBAL
-      // ------------------------------------------------------------
-      const MAX_OPEN_FILES = 10;
-      let mode = null;
-      let files = [];
-      let openFiles = [];
+      // Estado
+      let files = []; // { id, file, name, content, language, dirty, model }
       let activeFileId = null;
-      let expandedFolders = new Set(['']);
       let editor = null;
-      let directoryHandle = null;
-      let needsReRender = false;
-      let recentFolders = JSON.parse(localStorage.getItem('nexedit-recent') || '[]');
+      let fileCounter = 0;
 
-      // ------------------------------------------------------------
-      // 4. UTILIDADES
-      // ------------------------------------------------------------
-      function showToast(msg, type = 'info', duration = 3000) {
-        toast.textContent = msg;
+      // Utilidades
+      function showToast(message, type = 'info') {
+        toast.textContent = message;
         toast.className = `toast ${type}`;
-        toast.classList.remove('hidden');
-        setTimeout(() => toast.classList.add('hidden'), duration);
-      }
-
-      function updateFileCount() {
-        fileCount.textContent = `${files.length} archivos`;
-        const unsaved = openFiles.filter(f => f.dirty).length;
-        unsavedIndicator.textContent = unsaved > 0 ? `${unsaved} sin guardar` : '';
-        unsavedIndicator.style.color = unsaved > 0 ? '#ff9800' : '#666';
-      }
-
-      function updateTitle() {
-        const active = openFiles.find(f => f.id === activeFileId);
-        if (active) {
-          const dirtyMarker = active.dirty ? '● ' : '';
-          document.title = `${dirtyMarker}${active.name} · NEXEDIT`;
-          saveBtn.classList.toggle('dirty', active.dirty);
-        } else {
-          document.title = 'NEXEDIT · Editor Profesional';
-          saveBtn.classList.remove('dirty');
-        }
-        updateFileCount();
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
       }
 
       function detectLanguage(filename) {
         const ext = filename.split('.').pop().toLowerCase();
         const map = {
-          js: 'javascript', mjs: 'javascript', cjs: 'javascript',
-          ts: 'typescript', jsx: 'javascript', tsx: 'typescript',
-          html: 'html', htm: 'html', xhtml: 'html',
-          css: 'css', scss: 'scss', sass: 'scss', less: 'less',
-          json: 'json', jsonc: 'json',
-          md: 'markdown', mdx: 'markdown',
-          xml: 'xml', svg: 'xml',
-          yml: 'yaml', yaml: 'yaml',
-          py: 'python', pyc: 'python', pyo: 'python',
-          rb: 'ruby', erb: 'ruby',
-          go: 'go', mod: 'go', sum: 'go',
-          rs: 'rust', java: 'java', class: 'java', jar: 'java',
-          c: 'c', cpp: 'cpp', cc: 'cpp', cxx: 'cpp', h: 'cpp', hpp: 'cpp',
-          cs: 'csharp', csx: 'csharp',
-          php: 'php', phtml: 'php',
-          swift: 'swift', kt: 'kotlin', kts: 'kotlin',
-          sql: 'sql', sqlite: 'sql',
-          sh: 'shell', bash: 'shell', zsh: 'shell', fish: 'shell',
-          ps1: 'powershell', psd1: 'powershell', psm1: 'powershell',
-          dockerfile: 'dockerfile', makefile: 'makefile', gnumakefile: 'makefile',
-          env: 'ini', ini: 'ini', cfg: 'ini', conf: 'ini',
-          log: 'log', txt: 'plaintext'
+          js: 'javascript', mjs: 'javascript', ts: 'typescript', 
+          html: 'html', htm: 'html', css: 'css', scss: 'scss',
+          json: 'json', md: 'markdown', txt: 'plaintext',
+          py: 'python', java: 'java', cpp: 'cpp', c: 'c', h: 'c',
+          php: 'php', rb: 'ruby', go: 'go', rs: 'rust',
+          sql: 'sql', xml: 'xml', yml: 'yaml', yaml: 'yaml',
+          env: 'ini', ini: 'ini', cfg: 'ini', log: 'plaintext'
         };
         return map[ext] || 'plaintext';
       }
 
-      function getFileIcon(filename, isOpen = false) {
+      function getFileIcon(filename) {
         const ext = filename.split('.').pop().toLowerCase();
-        const iconMap = {
-          js: 'file-json', ts: 'file-typescript', jsx: 'file-json', tsx: 'file-typescript',
-          html: 'file-html', css: 'file-code', scss: 'file-code', json: 'file-json',
-          md: 'file-text', py: 'file-code', java: 'file-code', go: 'file-code',
-          rs: 'file-code', cpp: 'file-code', c: 'file-code', cs: 'file-code',
-          php: 'file-code', rb: 'file-code', swift: 'file-code', kt: 'file-code',
-          yml: 'file-code', yaml: 'file-code', xml: 'file-code', svg: 'file-image',
-          png: 'file-image', jpg: 'file-image', jpeg: 'file-image', gif: 'file-image',
-          mp4: 'file-video', mp3: 'file-audio', pdf: 'file-text', zip: 'file-archive'
+        const icons = {
+          js: 'file-json', ts: 'file-code', html: 'file-html',
+          css: 'file-code', json: 'file-json', md: 'file-text',
+          py: 'file-code', java: 'file-code', cpp: 'file-code',
+          c: 'file-code', php: 'file-code', rb: 'file-code'
         };
-        return iconMap[ext] || (isOpen ? 'folder-open' : 'folder');
+        return icons[ext] || 'file';
       }
 
-      // ------------------------------------------------------------
-      // 5. ÁRBOL DE ARCHIVOS (CORREGIDO)
-      // ------------------------------------------------------------
-      function renderTree() {
-        const rootUl = document.createElement('ul');
-        rootUl.className = 'tree';
-        buildTree(rootUl, '');
-        sidebarContent.innerHTML = '';
-        sidebarContent.appendChild(rootUl);
-        
-        if (activeFileId) {
-          const active = openFiles.find(f => f.id === activeFileId);
-          if (active) {
-            ensurePathExpanded(active.path);
-            if (needsReRender) {
-              needsReRender = false;
-              renderTree();
-              return;
-            }
-            setTimeout(() => highlightActiveFileInSidebar(active.path), 0);
-          }
+      function formatSize(bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+      }
+
+      // Sidebar toggle
+      function openSidebar() {
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('open');
+      }
+
+      function closeSidebarFn() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('open');
+      }
+
+      hamburgerBtn.addEventListener('click', openSidebar);
+      closeSidebar.addEventListener('click', closeSidebarFn);
+      sidebarOverlay.addEventListener('click', closeSidebarFn);
+
+      // Renderizar lista de archivos
+      function renderFileList() {
+        if (files.length === 0) {
+          emptyFiles.classList.remove('hidden');
+          fileList.classList.add('hidden');
+          fileCount.textContent = '0 archivos';
+          return;
         }
+
+        emptyFiles.classList.add('hidden');
+        fileList.classList.remove('hidden');
+        fileCount.textContent = `${files.length} archivo${files.length !== 1 ? 's' : ''}`;
+
+        fileList.innerHTML = files.map(f => `
+          <li class="file-item ${f.id === activeFileId ? 'active' : ''}" data-id="${f.id}">
+            <i data-lucide="${getFileIcon(f.name)}"></i>
+            <div class="file-info">
+              <div class="file-name">${f.name} ${f.dirty ? '<span style="color:#ff9800">●</span>' : ''}</div>
+              <div class="file-meta">${formatSize(f.file.size)} • ${f.language}</div>
+            </div>
+            <div class="file-actions">
+              <button class="icon-btn" data-action="close" data-id="${f.id}" title="Cerrar">
+                <i data-lucide="x"></i>
+              </button>
+            </div>
+          </li>
+        `).join('');
+
+        // Eventos
+        fileList.querySelectorAll('.file-item').forEach(item => {
+          item.addEventListener('click', (e) => {
+            if (e.target.closest('.file-actions')) return;
+            selectFile(item.dataset.id);
+          });
+        });
+
+        fileList.querySelectorAll('[data-action="close"]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeFile(btn.dataset.id);
+          });
+        });
+
         lucide.createIcons();
       }
 
-      function ensurePathExpanded(filePath) {
-        const parts = filePath.split('/');
-        let currentPath = '';
-        for (let i = 0; i < parts.length - 1; i++) {
-          currentPath = currentPath ? `${currentPath}/${parts[i]}` : parts[i];
-          if (!expandedFolders.has(currentPath)) {
-            expandedFolders.add(currentPath);
-            needsReRender = true;
-          }
-        }
-      }
+      // Agregar archivos
+      fileInput.addEventListener('change', async (e) => {
+        const selectedFiles = Array.from(e.target.files);
+        if (selectedFiles.length === 0) return;
 
-      function buildTree(parentUl, basePath) {
-        const items = new Map();
-        const normalizedBase = basePath === '' ? '' : basePath;
-
-        files.forEach(file => {
-          const parts = file.path.split('/');
-          let baseIndex = -1;
-          
-          if (normalizedBase === '') {
-            baseIndex = 0;
-          } else {
-            if (!file.path.startsWith(normalizedBase + '/') && file.path !== normalizedBase) {
-              return;
-            }
-            baseIndex = normalizedBase.split('/').length;
+        for (const file of selectedFiles) {
+          // Evitar duplicados
+          if (files.some(f => f.name === file.name && f.file.size === file.size)) {
+            showToast(`${file.name} ya está abierto`, 'info');
+            continue;
           }
 
-          if (baseIndex >= parts.length) return;
-
-          const itemName = parts[baseIndex];
-          const isDirectory = baseIndex < parts.length - 1;
-          const itemFullPath = normalizedBase === '' ? itemName : `${normalizedBase}/${itemName}`;
-
-          if (!items.has(itemName)) {
-            items.set(itemName, {
-              name: itemName,
-              fullPath: itemFullPath,
-              isDir: isDirectory,
-              fileData: isDirectory ? null : file
-            });
-          }
-        });
-
-        const sorted = Array.from(items.values()).sort((a, b) => {
-          if (a.isDir && !b.isDir) return -1;
-          if (!a.isDir && b.isDir) return 1;
-          return a.name.localeCompare(b.name);
-        });
-
-        sorted.forEach(item => {
-          const li = document.createElement('li');
-          const div = document.createElement('div');
-          div.className = 'tree-item';
-          div.dataset.path = item.fullPath;
-          div.dataset.kind = item.isDir ? 'directory' : 'file';
-          div.draggable = !item.isDir;
-
-          if (item.isDir) {
-            const expandSpan = document.createElement('span');
-            expandSpan.className = 'expand-icon';
-            const isExpanded = expandedFolders.has(item.fullPath);
-            if (isExpanded) expandSpan.classList.add('expanded');
-            expandSpan.innerHTML = `<i data-lucide="chevron-right"></i>`;
-            
-            expandSpan.addEventListener('click', (e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              toggleFolder(item.fullPath);
-            });
-            div.appendChild(expandSpan);
-          } else {
-            const spacer = document.createElement('span');
-            spacer.style.width = '18px';
-            spacer.style.display = 'inline-block';
-            div.appendChild(spacer);
-          }
-
-          const icon = document.createElement('i');
-          if (item.isDir) {
-            icon.dataset.lucide = expandedFolders.has(item.fullPath) ? 'folder-open' : 'folder';
-            icon.className = 'folder-icon';
-          } else {
-            icon.dataset.lucide = getFileIcon(item.name);
-            icon.className = 'file-icon';
-          }
-          div.appendChild(icon);
-
-          const nameSpan = document.createElement('span');
-          nameSpan.className = 'file-name';
-          nameSpan.textContent = item.name;
-          nameSpan.title = item.fullPath;
-          div.appendChild(nameSpan);
-
-          // Eventos de drag para archivos
-          if (!item.isDir) {
-            div.addEventListener('dragstart', (e) => {
-              e.dataTransfer.setData('text/plain', item.fullPath);
-              e.dataTransfer.effectAllowed = 'move';
-            });
-          }
-
-          // Context menu
-          div.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-            showContextMenu(e, item);
-          });
-
-          li.appendChild(div);
-
-          if (item.isDir && expandedFolders.has(item.fullPath)) {
-            const childUl = document.createElement('ul');
-            buildTree(childUl, item.fullPath);
-            li.appendChild(childUl);
-          }
-
-          parentUl.appendChild(li);
-        });
-      }
-
-      function toggleFolder(path) {
-        if (expandedFolders.has(path)) {
-          expandedFolders.delete(path);
-        } else {
-          expandedFolders.add(path);
-        }
-        renderTree();
-      }
-
-      function highlightActiveFileInSidebar(path) {
-        document.querySelectorAll('.tree-item.active').forEach(el => {
-          el.classList.remove('active');
-          const icon = el.querySelector('.folder-icon');
-          if (icon) {
-            const isExpanded = expandedFolders.has(el.dataset.path);
-            icon.dataset.lucide = isExpanded ? 'folder-open' : 'folder';
-          }
-        });
-        
-        const activeEl = document.querySelector(`.tree-item[data-path="${path}"]`);
-        if (activeEl) {
-          activeEl.classList.add('active');
-          const icon = activeEl.querySelector('.file-icon');
-          if (icon) icon.dataset.lucide = 'file-edit';
-          
-          // Scroll into view
-          activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-        lucide.createIcons();
-      }
-
-      // ------------------------------------------------------------
-      // 6. EVENTOS DEL ÁRBOL
-      // ------------------------------------------------------------
-      sidebarContent.addEventListener('click', async (e) => {
-        if (e.target.closest('.expand-icon')) return;
-        
-        const treeItem = e.target.closest('.tree-item');
-        if (!treeItem) return;
-
-        const kind = treeItem.dataset.kind;
-        const path = treeItem.dataset.path;
-
-        if (kind === 'file') {
-          e.preventDefault();
-          e.stopPropagation();
-          await openFileByPath(path);
-        } else if (kind === 'directory') {
-          e.preventDefault();
-          e.stopPropagation();
-          toggleFolder(path);
-        }
-      });
-
-      // ------------------------------------------------------------
-      // 7. APERTURA DE CARPETAS (FSA + FALLBACK)
-      // ------------------------------------------------------------
-      async function* walkDirectory(dirHandle, basePath = '') {
-        for await (const entry of dirHandle.values()) {
-          if (entry.kind === 'file') {
-            const path = basePath + entry.name;
-            yield { path, handle: entry, kind: 'file' };
-          } else if (entry.kind === 'directory') {
-            const dirPath = basePath + entry.name + '/';
-            yield { path: dirPath.slice(0, -1), handle: entry, kind: 'directory' };
-            yield* walkDirectory(entry, dirPath);
-          }
-        }
-      }
-
-      async function openFolderFSA() {
-        try {
-          const dirHandle = await window.showDirectoryPicker();
-          directoryHandle = dirHandle;
-          
-          // Guardar en recientes
-          addRecentFolder(dirHandle.name);
-          
-          await loadFilesFromHandle(dirHandle);
-          return true;
-        } catch (err) {
-          if (err.name === 'AbortError') return false;
-          console.error(err);
-          showToast('Error al abrir carpeta', 'error');
-          return false;
-        }
-      }
-
-      async function loadFilesFromHandle(dirHandle) {
-        files = [];
-        openFiles.forEach(f => f.model?.dispose());
-        openFiles = [];
-        activeFileId = null;
-        expandedFolders = new Set(['']);
-
-        for await (const { path, handle, kind } of walkDirectory(dirHandle)) {
-          if (kind === 'file') {
-            const fileName = path.split('/').pop();
-            files.push({
-              path,
-              name: fileName,
-              handle,
-              content: null,
-              language: detectLanguage(fileName)
-            });
-          }
-        }
-
-        files.sort((a, b) => a.path.localeCompare(b.path));
-        renderTree();
-        showToast(`Carpeta cargada: ${files.length} archivos`, 'success');
-      }
-
-      function openFolderFallback() {
-        folderPicker.click();
-      }
-
-      folderPicker.addEventListener('change', (e) => {
-        const fileList = e.target.files;
-        if (!fileList || fileList.length === 0) {
-          if (files.length === 0) {
-            splash.classList.remove('hidden');
-            appEl.classList.add('hidden');
-          }
-          return;
-        }
-
-        files = [];
-        openFiles.forEach(f => f.model?.dispose());
-        openFiles = [];
-        activeFileId = null;
-        expandedFolders = new Set(['']);
-
-        const rootFolderName = fileList[0].webkitRelativePath.split('/')[0];
-        addRecentFolder(rootFolderName);
-
-        for (let i = 0; i < fileList.length; i++) {
-          const file = fileList[i];
-          const path = file.webkitRelativePath;
-          files.push({
-            path,
-            name: file.name,
-            fileObject: file,
-            content: null,
-            language: detectLanguage(file.name)
-          });
-        }
-
-        files.sort((a, b) => a.path.localeCompare(b.path));
-        
-        splash.classList.add('hidden');
-        appEl.classList.remove('hidden');
-        renderTree();
-        showToast(`Carpeta cargada: ${files.length} archivos`, 'success');
-      });
-
-      function addRecentFolder(name) {
-        recentFolders = recentFolders.filter(f => f !== name);
-        recentFolders.unshift(name);
-        if (recentFolders.length > 5) recentFolders.pop();
-        localStorage.setItem('nexedit-recent', JSON.stringify(recentFolders));
-        updateRecentButton();
-      }
-
-      function updateRecentButton() {
-        if (recentFolders.length > 0) {
-          recentFoldersBtn.classList.remove('hidden');
-        }
-      }
-
-      // ------------------------------------------------------------
-      // 8. GESTIÓN DE ARCHIVOS ABIERTOS
-      // ------------------------------------------------------------
-      async function openFileByPath(path) {
-        if (openFiles.length >= MAX_OPEN_FILES) {
-          showToast('Máximo 10 archivos abiertos', 'error');
-          return;
-        }
-
-        const fileData = files.find(f => f.path === path);
-        if (!fileData) {
-          showToast('Archivo no encontrado', 'error');
-          return;
-        }
-
-        const existing = openFiles.find(f => f.path === path);
-        if (existing) {
-          setActiveFile(existing.id);
-          return;
-        }
-
-        if (!fileData.content) {
           try {
-            if (mode === 'fsa') {
-              const file = await fileData.handle.getFile();
-              fileData.content = await file.text();
-            } else {
-              fileData.content = await readFileAsText(fileData.fileObject);
-            }
+            const content = await readFile(file);
+            const id = 'file-' + (++fileCounter);
+            const language = detectLanguage(file.name);
+            
+            const fileData = {
+              id,
+              file,
+              name: file.name,
+              content,
+              language,
+              dirty: false,
+              originalContent: content
+            };
+
+            files.push(fileData);
           } catch (err) {
-            showToast('Error al leer archivo', 'error');
-            return;
+            showToast(`Error leyendo ${file.name}`, 'error');
           }
         }
 
-        const model = monaco.editor.createModel(fileData.content, fileData.language);
-        const fileId = 'file-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
+        renderFileList();
+        
+        // Abrir el último archivo agregado
+        if (files.length > 0) {
+          selectFile(files[files.length - 1].id);
+          openSidebar();
+        }
 
-        const newFile = {
-          id: fileId,
-          path: fileData.path,
-          name: fileData.name,
-          model: model,
-          dirty: false,
-          originalContent: fileData.content,
-          fileData: fileData
-        };
+        fileInput.value = '';
+      });
 
-        model.onDidChangeContent(() => {
-          const current = model.getValue();
-          const dirty = current !== newFile.originalContent;
-          if (newFile.dirty !== dirty) {
-            newFile.dirty = dirty;
-            fileData.content = current;
-            updateTitle();
-            renderTabs();
-          }
-        });
-
-        openFiles.push(newFile);
-        renderTabs();
-        setActiveFile(fileId);
-        updateBreadcrumbs(path);
-      }
-
-      function readFileAsText(file) {
+      function readFile(file) {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = (e) => resolve(e.target.result);
@@ -1164,324 +706,164 @@
         });
       }
 
-      function setActiveFile(fileId) {
-        const file = openFiles.find(f => f.id === fileId);
-        if (!file) return;
+      // Seleccionar archivo
+      function selectFile(id) {
+        const fileData = files.find(f => f.id === id);
+        if (!fileData) return;
 
-        activeFileId = fileId;
+        activeFileId = id;
         
+        // Crear o actualizar modelo
+        if (!fileData.model) {
+          fileData.model = monaco.editor.createModel(fileData.content, fileData.language);
+          
+          fileData.model.onDidChangeContent(() => {
+            const current = fileData.model.getValue();
+            const isDirty = current !== fileData.originalContent;
+            if (fileData.dirty !== isDirty) {
+              fileData.dirty = isDirty;
+              updateUI();
+            }
+          });
+        }
+
+        // Crear editor si no existe
         if (!editor) {
+          emptyState.remove();
           editor = monaco.editor.create(editorContainer, {
-            model: file.model,
+            model: fileData.model,
             theme: 'vs-dark',
             automaticLayout: true,
             fontSize: 14,
-            fontFamily: 'JetBrains Mono, Fira Code, Consolas, monospace',
-            minimap: { enabled: true, scale: 1 },
+            fontFamily: 'JetBrains Mono, Fira Code, monospace',
+            minimap: { enabled: true },
             scrollBeyondLastLine: false,
             wordWrap: 'on',
             lineNumbers: 'on',
             renderWhitespace: 'selection',
             bracketPairColorization: { enabled: true },
-            formatOnPaste: true,
-            formatOnType: true,
-            autoIndent: 'full',
             tabSize: 2,
             insertSpaces: true
           });
         } else {
-          editor.setModel(file.model);
+          editor.setModel(fileData.model);
         }
 
-        renderTabs();
-        highlightActiveFileInSidebar(file.path);
-        updateBreadcrumbs(file.path);
-        updateTitle();
+        updateUI();
+        closeSidebarFn();
       }
 
-      function closeFile(fileId) {
-        const idx = openFiles.findIndex(f => f.id === fileId);
+      // Cerrar archivo
+      function closeFile(id) {
+        const idx = files.findIndex(f => f.id === id);
         if (idx === -1) return;
 
-        const file = openFiles[idx];
-        if (file.dirty && !confirm(`Hay cambios sin guardar en ${file.name}. ¿Cerrar igualmente?`)) {
-          return;
+        const file = files[idx];
+        
+        if (file.dirty) {
+          if (!confirm(`Hay cambios sin guardar en ${file.name}. ¿Cerrar igualmente?`)) {
+            return;
+          }
         }
 
-        file.model.dispose();
-        openFiles.splice(idx, 1);
+        file.model?.dispose();
+        files.splice(idx, 1);
 
-        if (activeFileId === fileId) {
-          if (openFiles.length > 0) {
-            setActiveFile(openFiles[Math.min(idx, openFiles.length - 1)].id);
+        if (activeFileId === id) {
+          if (files.length > 0) {
+            selectFile(files[Math.min(idx, files.length - 1)].id);
           } else {
             activeFileId = null;
             editor?.dispose();
             editor = null;
             editorContainer.innerHTML = `
-              <div class="empty-state">
+              <div class="empty-state" id="empty-state">
                 <i data-lucide="file-code"></i>
-                <h3>No hay archivos abiertos</h3>
-                <p>Haz clic en un archivo del explorador o usa <kbd>Ctrl+O</kbd> para abrir una carpeta</p>
+                <h2>Todos los archivos cerrados</h2>
+                <p>Usa el menú lateral para agregar más archivos</p>
               </div>
             `;
             lucide.createIcons();
-            breadcrumbs.classList.add('hidden');
-            tabsContainer.innerHTML = '';
-            updateTitle();
           }
+        }
+
+        renderFileList();
+        updateUI();
+      }
+
+      // Actualizar UI
+      function updateUI() {
+        const active = files.find(f => f.id === activeFileId);
+        
+        if (active) {
+          filenameDisplay.textContent = active.name + (active.dirty ? ' ●' : '');
+          filenameDisplay.className = 'filename-display' + (active.dirty ? ' dirty' : '');
+          saveBtn.disabled = !active.dirty;
         } else {
-          renderTabs();
-        }
-      }
-
-      // ------------------------------------------------------------
-      // 9. PESTAÑAS
-      // ------------------------------------------------------------
-      function renderTabs() {
-        if (openFiles.length === 0) {
-          tabsContainer.innerHTML = '';
-          return;
+          filenameDisplay.textContent = 'Ningún archivo abierto';
+          filenameDisplay.className = 'filename-display empty';
+          saveBtn.disabled = true;
         }
 
-        tabsContainer.innerHTML = openFiles.map(file => `
-          <div class="tab ${file.id === activeFileId ? 'active' : ''} ${file.dirty ? 'dirty' : ''}" data-file-id="${file.id}">
-            <i data-lucide="${getFileIcon(file.name)}" style="width: 14px; height: 14px;"></i>
-            <span class="tab-label">${file.name}</span>
-            <span class="tab-close" data-file-id="${file.id}">
-              <i data-lucide="x"></i>
-            </span>
-          </div>
-        `).join('');
-
-        tabsContainer.querySelectorAll('.tab').forEach(tab => {
-          tab.addEventListener('click', (e) => {
-            if (e.target.closest('.tab-close')) return;
-            setActiveFile(tab.dataset.fileId);
-          });
-        });
-
-        tabsContainer.querySelectorAll('.tab-close').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            closeFile(btn.dataset.fileId);
-          });
-        });
-
-        lucide.createIcons();
+        renderFileList();
       }
 
-      // ------------------------------------------------------------
-      // 10. BREADCRUMBS
-      // ------------------------------------------------------------
-      function updateBreadcrumbs(path) {
-        if (!path) {
-          breadcrumbs.classList.add('hidden');
-          return;
-        }
-
-        const parts = path.split('/');
-        breadcrumbs.classList.remove('hidden');
-        breadcrumbs.innerHTML = parts.map((part, idx) => {
-          const partialPath = parts.slice(0, idx + 1).join('/');
-          const isLast = idx === parts.length - 1;
-          return `
-            ${idx > 0 ? '<span class="breadcrumb-separator">/</span>' : ''}
-            <span class="breadcrumb-item ${isLast ? 'active' : ''}" data-path="${partialPath}" data-is-file="${isLast}">
-              ${part}
-            </span>
-          `;
-        }).join('');
-
-        breadcrumbs.querySelectorAll('.breadcrumb-item').forEach(item => {
-          item.addEventListener('click', () => {
-            if (item.dataset.isFile === 'false') {
-              toggleFolder(item.dataset.path);
-            }
-          });
-        });
-      }
-
-      // ------------------------------------------------------------
-      // 11. GUARDAR
-      // ------------------------------------------------------------
+      // Guardar archivo
       async function saveFile() {
-        if (!activeFileId) {
-          showToast('No hay archivo activo', 'error');
-          return;
-        }
-
-        const file = openFiles.find(f => f.id === activeFileId);
-        if (!file || !file.dirty) return;
+        const active = files.find(f => f.id === activeFileId);
+        if (!active || !active.dirty) return;
 
         try {
-          if (mode === 'fsa') {
-            const handle = file.fileData.handle;
-            if (await handle.queryPermission({ mode: 'readwrite' }) !== 'granted') {
-              const perm = await handle.requestPermission({ mode: 'readwrite' });
-              if (perm !== 'granted') throw new Error('Permiso denegado');
-            }
-            const writable = await handle.createWritable();
-            await writable.write(file.model.getValue());
-            await writable.close();
-          } else {
-            const content = file.model.getValue();
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = file.name;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-          }
+          const content = active.model.getValue();
+          const blob = new Blob([content], { type: 'text/plain' });
+          const url = URL.createObjectURL(blob);
+          
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = active.name;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
 
-          file.originalContent = file.model.getValue();
-          file.dirty = false;
-          updateTitle();
-          renderTabs();
-          showToast(`${file.name} guardado`, 'success');
+          active.originalContent = content;
+          active.dirty = false;
+          active.content = content;
+          
+          updateUI();
+          showToast(`${active.name} guardado`, 'success');
         } catch (err) {
-          console.error(err);
           showToast('Error al guardar', 'error');
         }
       }
 
-      // ------------------------------------------------------------
-      // 12. BÚSQUEDA
-      // ------------------------------------------------------------
-      function filterFiles(query) {
-        if (!query) {
-          renderTree();
-          return;
-        }
+      // Nuevo archivo (crear vacío)
+      newFileBtn.addEventListener('click', () => {
+        const name = prompt('Nombre del nuevo archivo (con extensión):', 'nuevo-archivo.txt');
+        if (!name) return;
 
-        const matches = files.filter(f => 
-          f.name.toLowerCase().includes(query.toLowerCase()) ||
-          f.path.toLowerCase().includes(query.toLowerCase())
-        );
-
-        // Renderizar solo matches con sus paths expandidos
-        expandedFolders = new Set(['']);
-        matches.forEach(f => {
-          const parts = f.path.split('/');
-          let current = '';
-          for (let i = 0; i < parts.length - 1; i++) {
-            current = current ? `${current}/${parts[i]}` : parts[i];
-            expandedFolders.add(current);
-          }
-        });
-
-        renderTree();
+        const id = 'file-' + (++fileCounter);
+        const language = detectLanguage(name);
+        const content = '';
         
-        // Highlight matches
-        setTimeout(() => {
-          document.querySelectorAll('.tree-item').forEach(item => {
-            const path = item.dataset.path;
-            const file = files.find(f => f.path === path);
-            if (file && matches.includes(file)) {
-              item.style.background = '#1e3a5f';
-            }
-          });
-        }, 0);
-      }
-
-      globalSearch.addEventListener('input', (e) => {
-        filterFiles(e.target.value);
-      });
-
-      globalSearch.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          globalSearch.value = '';
-          filterFiles('');
-          globalSearch.blur();
-        }
-      });
-
-      // ------------------------------------------------------------
-      // 13. CONTEXT MENU
-      // ------------------------------------------------------------
-      function showContextMenu(e, item) {
-        contextMenu.style.display = 'block';
-        contextMenu.style.left = e.pageX + 'px';
-        contextMenu.style.top = e.pageY + 'px';
-        
-        // Configurar acciones según el tipo
-        const renameBtn = document.getElementById('ctx-rename');
-        const deleteBtn = document.getElementById('ctx-delete');
-        
-        renameBtn.onclick = () => {
-          const newName = prompt('Nuevo nombre:', item.name);
-          if (newName && newName !== item.name) {
-            showToast('Renombrar no implementado en modo ' + mode, 'info');
-          }
-          hideContextMenu();
+        const fileData = {
+          id,
+          file: { name, size: 0 },
+          name,
+          content,
+          language,
+          dirty: true,
+          originalContent: content
         };
-        
-        deleteBtn.onclick = () => {
-          if (confirm(`¿Eliminar ${item.name}?`)) {
-            showToast('Eliminar no implementado en modo ' + mode, 'info');
-          }
-          hideContextMenu();
-        };
-      }
 
-      function hideContextMenu() {
-        contextMenu.style.display = 'none';
-      }
-
-      document.addEventListener('click', hideContextMenu);
-
-      // ------------------------------------------------------------
-      // 14. BOTONES Y ATAJOS
-      // ------------------------------------------------------------
-      async function openFolder() {
-        const supportsFSA = window.showDirectoryPicker && window.isSecureContext;
-        
-        if (supportsFSA) {
-          mode = 'fsa';
-          modeBadge.textContent = 'FS API';
-          const success = await openFolderFSA();
-          if (success) {
-            splash.classList.add('hidden');
-            appEl.classList.remove('hidden');
-          }
-        } else {
-          mode = 'fallback';
-          modeBadge.textContent = 'Compatibilidad';
-          splash.classList.add('hidden');
-          appEl.classList.remove('hidden');
-          openFolderFallback();
-        }
-      }
-
-      collapseAllBtn.addEventListener('click', () => {
-        expandedFolders = new Set(['']);
-        renderTree();
+        files.push(fileData);
+        selectFile(id);
+        openSidebar();
+        showToast('Archivo creado. Agrega contenido y guárdalo.', 'info');
       });
 
-      refreshBtn.addEventListener('click', async () => {
-        if (mode === 'fsa' && directoryHandle) {
-          await loadFilesFromHandle(directoryHandle);
-          showToast('Explorador actualizado', 'success');
-        } else {
-          showToast('Refrescar solo disponible en modo FS API', 'info');
-        }
-      });
-
-      splashOpenBtn.addEventListener('click', openFolder);
-      openFolderBtn.addEventListener('click', openFolder);
+      // Eventos
       saveBtn.addEventListener('click', saveFile);
-      closeFileBtn.addEventListener('click', () => {
-        if (activeFileId) closeFile(activeFileId);
-      });
-
-      recentFoldersBtn.addEventListener('click', () => {
-        if (recentFolders.length > 0) {
-          openFolder();
-        }
-      });
 
       // Atajos de teclado
       document.addEventListener('keydown', (e) => {
@@ -1490,39 +872,18 @@
           e.preventDefault();
           saveFile();
         }
-        // Ctrl+W: Cerrar archivo
-        else if ((e.ctrlKey || e.metaKey) && e.key === 'w') {
-          e.preventDefault();
-          if (activeFileId) closeFile(activeFileId);
-        }
-        // Ctrl+O: Abrir carpeta
+        // Ctrl+O: Agregar archivo
         else if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
           e.preventDefault();
-          openFolder();
+          fileInput.click();
         }
-        // Ctrl+P: Buscar archivo
-        else if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
-          e.preventDefault();
-          globalSearch.focus();
-        }
-        // Escape: Limpiar búsqueda
-        else if (e.key === 'Escape' && document.activeElement === globalSearch) {
-          globalSearch.value = '';
-          filterFiles('');
-          globalSearch.blur();
+        // Escape: Cerrar sidebar
+        else if (e.key === 'Escape') {
+          closeSidebarFn();
         }
       });
 
-      // ------------------------------------------------------------
-      // 15. INICIALIZACIÓN
-      // ------------------------------------------------------------
-      if (window.showDirectoryPicker && window.isSecureContext) {
-        modeHint.innerHTML = '✓ <strong>File System Access API</strong> disponible<br>Permite guardar directamente en disco';
-      } else {
-        modeHint.innerHTML = 'ℹ️ Usando modo compatible<br>Los archivos se descargan al guardar';
-      }
-
-      updateRecentButton();
+      // Inicializar
       lucide.createIcons();
     })();
   </script>

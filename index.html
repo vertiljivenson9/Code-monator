@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-  <title>NEXEDIT · Editor profesional</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>NEXEDIT · File System Access API</title>
   <!-- Monaco Editor -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/min/vs/editor/editor.main.css" />
   <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/min/vs/loader.js"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    /* ----- RESET PROFESIONAL ----- */
+    /* ----- RESET PROFESIONAL OSCURO ----- */
     * {
       margin: 0;
       padding: 0;
@@ -23,7 +23,7 @@
       overflow: hidden;
       color: #d4d4d4;
     }
-    /* ----- SPLASH SCREEN ----- */
+    /* ----- SPLASH / INICIO ----- */
     .splash {
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
@@ -123,17 +123,13 @@
       width: 16px;
       height: 16px;
     }
-    /* ----- WORKSPACE (SIDEBAR + EDITOR) ----- */
+    /* ----- WORKSPACE: SIDEBAR + EDITOR ----- */
     .workspace {
       display: grid;
       grid-template-columns: 280px 1fr;
       overflow: hidden;
     }
-    @media (max-width: 640px) {
-      .workspace { grid-template-columns: 1fr; }
-      .sidebar { display: none; }
-    }
-    /* ----- SIDEBAR (ÁRBOL DE ARCHIVOS) ----- */
+    /* ----- SIDEBAR (LISTA PLANA DE ARCHIVOS) ----- */
     .sidebar {
       background: #252526;
       border-right: 1px solid #333;
@@ -141,103 +137,52 @@
       padding: 16px 0;
       font-size: 13px;
     }
-    .tree, .tree ul {
+    .file-list {
       list-style: none;
-      padding-left: 0;
+      padding: 0;
+      margin: 0;
     }
-    .tree ul {
-      padding-left: 20px;
-    }
-    .tree-item {
+    .file-item {
       display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 0 8px 0 4px;
-      min-height: 28px;
-      border-radius: 4px;
+      gap: 8px;
+      padding: 6px 16px;
       cursor: pointer;
       color: #ccc;
       transition: background 0.1s;
-      white-space: nowrap;
+      border-left: 3px solid transparent;
     }
-    .tree-item:hover {
+    .file-item:hover {
       background: #2a2d2e;
     }
-    .tree-item.active {
+    .file-item.active {
       background: #2a3f4f;
       color: white;
+      border-left-color: #007acc;
     }
-    .tree-item i {
+    .file-item i {
       width: 16px;
       height: 16px;
       flex-shrink: 0;
-    }
-    .expand-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 20px;
-      height: 20px;
-      color: #b0b0b0;
-      cursor: pointer;
     }
     .file-name {
       flex: 1;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .file-path {
+      font-size: 11px;
+      color: #8a8a8a;
+      margin-left: 8px;
+      display: none; /* opcional: se puede mostrar en hover */
     }
     /* ----- EDITOR ----- */
     .editor-area {
       display: grid;
-      grid-template-rows: 36px 1fr;
+      grid-template-rows: 1fr;
       background: #1e1e1e;
       overflow: hidden;
-    }
-    .tabs {
-      display: flex;
-      background: #252526;
-      border-bottom: 1px solid #333;
-      overflow-x: auto;
-    }
-    .tab {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 0 12px;
-      background: #2d2d2d;
-      border-right: 1px solid #3e3e3e;
-      color: #b0b0b0;
-      font-size: 13px;
-      height: 36px;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .tab.active {
-      background: #1e1e1e;
-      color: white;
-      border-bottom: 2px solid #007acc;
-    }
-    .tab.dirty .tab-label::after {
-      content: "●";
-      margin-left: 6px;
-      font-size: 12px;
-      color: #ff9800;
-    }
-    .tab-close {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 20px;
-      height: 20px;
-      border-radius: 4px;
-    }
-    .tab-close:hover {
-      background: #4a4a4a;
-      color: white;
-    }
-    .tab-close i {
-      width: 14px;
-      height: 14px;
     }
     #editor-container {
       width: 100%;
@@ -265,7 +210,7 @@
   <div id="splash-screen" class="splash">
     <div class="splash-content">
       <h1>NEXEDIT</h1>
-      <p class="subtitle">Professional Local Code Editor</p>
+      <p class="subtitle">File System Access API · Minimal</p>
       <button id="splash-open-folder" class="btn-primary">
         <i data-lucide="folder-open"></i> Abrir carpeta
       </button>
@@ -291,17 +236,13 @@
 
     <div class="workspace">
       <aside class="sidebar" id="sidebar">
-        <!-- El árbol se generará dinámicamente -->
+        <!-- Aquí se inyectará la lista plana de archivos -->
       </aside>
       <main class="editor-area">
-        <div class="tabs" id="tabs-container"></div>
         <div id="editor-container"></div>
       </main>
     </div>
   </div>
-
-  <!-- INPUT OCULTO PARA SELECCIONAR CARPETA (webkitdirectory) -->
-  <input type="file" id="folder-picker" webkitdirectory style="display: none;" />
 
   <!-- TOAST NOTIFICACIÓN -->
   <div id="save-toast" class="toast hidden">✓ Archivo guardado</div>
@@ -309,7 +250,7 @@
   <script>
     (async function() {
       // ------------------------------------------------------------
-      // 1. INICIALIZAR MONACO
+      // 1. INICIALIZAR MONACO (AMD)
       // ------------------------------------------------------------
       await new Promise((resolve) => {
         require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/min/vs' } });
@@ -322,22 +263,19 @@
       const splash = document.getElementById('splash-screen');
       const appEl = document.getElementById('app');
       const sidebarEl = document.getElementById('sidebar');
-      const tabsContainer = document.getElementById('tabs-container');
       const editorContainer = document.getElementById('editor-container');
-      const folderPicker = document.getElementById('folder-picker');
       const saveBtn = document.getElementById('save-btn');
       const openFolderBtn = document.getElementById('open-folder-btn');
       const splashOpenBtn = document.getElementById('splash-open-folder');
       const toast = document.getElementById('save-toast');
 
       // ------------------------------------------------------------
-      // 3. ESTADO GLOBAL (SENCILLO, ROBUSTO)
+      // 3. ESTADO GLOBAL (SOLO FILE SYSTEM ACCESS API)
       // ------------------------------------------------------------
-      let files = [];               // Todos los archivos: { path, name, file, content, language }
-      let openFiles = [];          // Archivos abiertos: { id, path, name, model, dirty, originalContent }
-      let activeFileId = null;
-      let expandedFolders = new Set(['']); // Rutas expandidas
-
+      let directoryHandle = null;                // Guardamos el directorio raíz (opcional)
+      const fileHandlesMap = new Map();         // path -> FileSystemFileHandle
+      let filePaths = [];                       // array de rutas para mostrar ordenadas
+      let currentFileHandle = null;            // handle del archivo activo
       let editor = null;
 
       // ------------------------------------------------------------
@@ -349,397 +287,230 @@
         setTimeout(() => toast.classList.add('hidden'), duration);
       }
 
-      // Mapeo COMPLETO de extensiones a lenguajes Monaco
-      function getLanguageFromExtension(filename) {
+      // ------------------------------------------------------------
+      // 5. RECORRER DIRECTORIO RECURSIVAMENTE (SIN FileReader)
+      //    Almacena SOLO FileSystemFileHandle, NUNCA el nombre suelto.
+      // ------------------------------------------------------------
+      async function* walkDirectory(dirHandle, basePath = '') {
+        for await (const entry of dirHandle.values()) {
+          if (entry.kind === 'file') {
+            const path = basePath + entry.name;
+            yield { path, handle: entry };
+          } else if (entry.kind === 'directory') {
+            yield* walkDirectory(entry, basePath + entry.name + '/');
+          }
+        }
+      }
+
+      // ------------------------------------------------------------
+      // 6. ABRIR CARPETA (showDirectoryPicker)
+      // ------------------------------------------------------------
+      async function openFolder() {
+        if (!window.showDirectoryPicker) {
+          alert('Tu navegador no soporta File System Access API. Necesitas Safari 15.4+, Chrome/Edge 86+.');
+          return;
+        }
+
+        try {
+          const dirHandle = await window.showDirectoryPicker();
+          directoryHandle = dirHandle;
+
+          // Limpiar estado anterior
+          fileHandlesMap.clear();
+          filePaths = [];
+          currentFileHandle = null;
+          if (editor) {
+            editor.setModel(monaco.editor.createModel('Selecciona un archivo para editar', 'plaintext'));
+          }
+
+          // Recorrer y recolectar SOLO handles
+          for await (const { path, handle } of walkDirectory(dirHandle)) {
+            fileHandlesMap.set(path, handle);
+            filePaths.push(path);
+          }
+
+          // Ordenar rutas alfabéticamente
+          filePaths.sort((a, b) => a.localeCompare(b));
+
+          // Renderizar lista plana en sidebar
+          renderFileList();
+
+          // Ocultar splash y mostrar app
+          splash.classList.add('hidden');
+          appEl.classList.remove('hidden');
+
+          showToastMessage(`Carpeta abierta: ${filePaths.length} archivos`);
+          lucide.createIcons();
+        } catch (err) {
+          if (err.name === 'AbortError') return; // usuario canceló
+          console.error(err);
+          alert('Error al abrir la carpeta: ' + err.message);
+        }
+      }
+
+      // ------------------------------------------------------------
+      // 7. RENDERIZAR LISTA PLANA DE ARCHIVOS (SIN ÁRBOL)
+      // ------------------------------------------------------------
+      function renderFileList() {
+        if (!sidebarEl) return;
+        const ul = document.createElement('ul');
+        ul.className = 'file-list';
+
+        filePaths.forEach(path => {
+          const handle = fileHandlesMap.get(path);
+          if (!handle) return;
+
+          const li = document.createElement('li');
+          li.className = 'file-item';
+          li.dataset.path = path;
+
+          // Icono de archivo
+          const icon = document.createElement('i');
+          icon.dataset.lucide = 'file';
+          li.appendChild(icon);
+
+          // Nombre del archivo (solo el nombre base)
+          const nameSpan = document.createElement('span');
+          nameSpan.className = 'file-name';
+          const fileName = path.split('/').pop() || path;
+          nameSpan.textContent = fileName;
+          li.appendChild(nameSpan);
+
+          // Ruta completa (oculta, pero podemos guardarla en dataset)
+          li.title = path;
+
+          li.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            await openFileByHandle(handle, path);
+          });
+
+          ul.appendChild(li);
+        });
+
+        sidebarEl.innerHTML = '';
+        sidebarEl.appendChild(ul);
+        lucide.createIcons();
+      }
+
+      // ------------------------------------------------------------
+      // 8. ABRIR ARCHIVO USANDO EL HANDLE (getFile + text)
+      //    SIN FileReader, SIN input file.
+      // ------------------------------------------------------------
+      async function openFileByHandle(fileHandle, path) {
+        try {
+          // Obtener el archivo y su contenido con la API moderna
+          const file = await fileHandle.getFile();
+          const content = await file.text();
+
+          // Actualizar editor
+          if (!editor) {
+            editor = monaco.editor.create(editorContainer, {
+              value: content,
+              language: detectLanguage(file.name),
+              theme: 'vs-dark',
+              automaticLayout: true,
+              fontSize: 14,
+              fontFamily: 'JetBrains Mono, Fira Code, monospace',
+              minimap: { enabled: false }
+            });
+          } else {
+            const model = monaco.editor.createModel(content, detectLanguage(file.name));
+            editor.setModel(model);
+          }
+
+          // Guardar handle actual para guardar después
+          currentFileHandle = fileHandle;
+
+          // Resaltar elemento activo en la lista
+          document.querySelectorAll('.file-item.active').forEach(el => el.classList.remove('active'));
+          const activeEl = document.querySelector(`.file-item[data-path="${path}"]`);
+          if (activeEl) activeEl.classList.add('active');
+
+          showToastMessage(`✓ ${file.name} abierto`);
+        } catch (err) {
+          console.error(err);
+          showToastMessage('✗ Error al abrir el archivo');
+        }
+      }
+
+      // ------------------------------------------------------------
+      // 9. DETECCIÓN DE LENGUAJE (para Monaco)
+      // ------------------------------------------------------------
+      function detectLanguage(filename) {
         const ext = filename.split('.').pop().toLowerCase();
         const map = {
-          // Web
-          'html': 'html', 'htm': 'html', 'css': 'css', 'scss': 'scss', 'less': 'less',
-          'js': 'javascript', 'jsx': 'javascript', 'ts': 'typescript', 'tsx': 'typescript',
-          'json': 'json', 'xml': 'xml', 'svg': 'xml',
-          // Backend
-          'py': 'python', 'rb': 'ruby', 'php': 'php', 'java': 'java', 'c': 'c',
-          'cpp': 'cpp', 'h': 'cpp', 'hpp': 'cpp', 'cs': 'csharp', 'go': 'go',
-          'rs': 'rust', 'swift': 'swift', 'kt': 'kotlin', 'kts': 'kotlin',
-          'sql': 'sql', 'sh': 'shell', 'bash': 'shell', 'yml': 'yaml', 'yaml': 'yaml',
-          'md': 'markdown', 'txt': 'plaintext', 'ini': 'ini', 'cfg': 'ini',
-          // Otros
-          'dockerfile': 'dockerfile', 'makefile': 'makefile'
+          js: 'javascript', ts: 'typescript', jsx: 'javascript', tsx: 'typescript',
+          html: 'html', css: 'css', json: 'json', md: 'markdown',
+          py: 'python', rb: 'ruby', go: 'go', rs: 'rust', java: 'java',
+          cpp: 'cpp', c: 'c', php: 'php', xml: 'xml', yaml: 'yaml',
+          sh: 'shell', sql: 'sql', swift: 'swift', kt: 'kotlin'
         };
         return map[ext] || 'plaintext';
       }
 
-      // Leer archivo como texto
-      function readFileContent(file) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target.result);
-          reader.onerror = reject;
-          reader.readAsText(file);
-        });
-      }
-
       // ------------------------------------------------------------
-      // 5. APERTURA DE CARPETA (webkitdirectory)
+      // 10. GUARDAR ARCHIVO (createWritable)
+      //     Maneja permisos de escritura si es necesario.
       // ------------------------------------------------------------
-      function openFolder() {
-        folderPicker.click();
-      }
-
-      folderPicker.addEventListener('change', async (e) => {
-        const fileList = e.target.files;
-        if (!fileList || fileList.length === 0) return;
-
-        // Resetear estado
-        files = [];
-        openFiles.forEach(f => f.model?.dispose());
-        openFiles = [];
-        activeFileId = null;
-        expandedFolders = new Set(['']);
-
-        // Leer todos los archivos del FileList
-        for (let i = 0; i < fileList.length; i++) {
-          const file = fileList[i];
-          const path = file.webkitRelativePath;
-          files.push({
-            path: path,
-            name: file.name,
-            file: file,
-            content: null,        // Se leerá bajo demanda
-            language: getLanguageFromExtension(file.name)
-          });
-        }
-
-        // Ordenar para que carpetas aparezcan primero en el árbol (alfabético)
-        files.sort((a, b) => a.path.localeCompare(b.path));
-
-        // Inicializar editor si no existe
-        if (!editor) {
-          editor = monaco.editor.create(editorContainer, {
-            value: 'Selecciona un archivo para editar',
-            language: 'plaintext',
-            theme: 'vs-dark',
-            automaticLayout: true,
-            fontSize: 14,
-            fontFamily: 'JetBrains Mono, Fira Code, monospace',
-            minimap: { enabled: false }
-          });
-        } else {
-          editor.setModel(monaco.editor.createModel('Selecciona un archivo para editar', 'plaintext'));
-        }
-
-        // Ocultar splash y mostrar app
-        splash.classList.add('hidden');
-        appEl.classList.remove('hidden');
-
-        // Renderizar árbol
-        renderTree();
-        showToastMessage(`Carpeta abierta: ${files[0]?.path.split('/')[0] || 'carpeta'} (${files.length} archivos)`);
-        lucide.createIcons();
-      });
-
-      // ------------------------------------------------------------
-      // 6. RENDERIZAR ÁRBOL (estilo Textastic)
-      // ------------------------------------------------------------
-      function renderTree() {
-        const rootUl = document.createElement('ul');
-        rootUl.className = 'tree';
-        buildTree(rootUl, '');
-        sidebarEl.innerHTML = '';
-        sidebarEl.appendChild(rootUl);
-        // Restaurar resaltado si hay archivo activo
-        if (activeFileId) {
-          const active = openFiles.find(f => f.id === activeFileId);
-          if (active) highlightActiveFileInSidebar(active.path);
-        }
-      }
-
-      function buildTree(parentUl, basePath) {
-        const children = new Map(); // key = fullPath, value = { name, fullPath, isDir }
-
-        files.forEach(file => {
-          const parts = file.path.split('/');
-          let current = '';
-          for (let i = 0; i < parts.length; i++) {
-            const part = parts[i];
-            const prev = current;
-            current = current ? `${current}/${part}` : part;
-            if (current === basePath) continue;
-            if (prev === basePath || (basePath === '' && i === 0)) {
-              const name = part;
-              const fullPath = current;
-              const isDir = i < parts.length - 1;
-              if (!children.has(fullPath)) {
-                children.set(fullPath, { name, fullPath, isDir });
-              }
-            }
-          }
-        });
-
-        // Ordenar: carpetas primero, luego archivos, alfabético
-        const sorted = Array.from(children.values()).sort((a, b) => {
-          if (a.isDir && !b.isDir) return -1;
-          if (!a.isDir && b.isDir) return 1;
-          return a.name.localeCompare(b.name);
-        });
-
-        sorted.forEach(item => {
-          const li = document.createElement('li');
-          const div = document.createElement('div');
-          div.className = 'tree-item';
-          div.dataset.path = item.fullPath;
-          div.dataset.kind = item.isDir ? 'directory' : 'file';
-
-          // Espaciador / expandir
-          if (item.isDir) {
-            const expandSpan = document.createElement('span');
-            expandSpan.className = 'expand-icon';
-            const isExpanded = expandedFolders.has(item.fullPath);
-            const expandIcon = document.createElement('i');
-            expandIcon.dataset.lucide = isExpanded ? 'chevron-down' : 'chevron-right';
-            expandSpan.appendChild(expandIcon);
-            expandSpan.addEventListener('click', (e) => {
-              e.stopPropagation();
-              if (expandedFolders.has(item.fullPath)) {
-                expandedFolders.delete(item.fullPath);
-              } else {
-                expandedFolders.add(item.fullPath);
-              }
-              renderTree(); // Simplificado: re-render completo
-            });
-            div.appendChild(expandSpan);
-          } else {
-            const spacer = document.createElement('span');
-            spacer.style.width = '20px';
-            spacer.style.display = 'inline-block';
-            div.appendChild(spacer);
-          }
-
-          // Icono
-          const icon = document.createElement('i');
-          if (item.isDir) {
-            icon.dataset.lucide = expandedFolders.has(item.fullPath) ? 'folder-open' : 'folder';
-          } else {
-            icon.dataset.lucide = 'file';
-          }
-          div.appendChild(icon);
-
-          // Nombre
-          const nameSpan = document.createElement('span');
-          nameSpan.className = 'file-name';
-          nameSpan.textContent = item.name;
-          div.appendChild(nameSpan);
-
-          li.appendChild(div);
-
-          // Hijos si es carpeta expandida
-          if (item.isDir && expandedFolders.has(item.fullPath)) {
-            const childUl = document.createElement('ul');
-            buildTree(childUl, item.fullPath);
-            li.appendChild(childUl);
-          }
-
-          parentUl.appendChild(li);
-        });
-      }
-
-      // ------------------------------------------------------------
-      // 7. DELEGACIÓN DE EVENTOS (100% FIABLE)
-      // ------------------------------------------------------------
-      sidebarEl.addEventListener('click', async (e) => {
-        const treeItem = e.target.closest('.tree-item');
-        if (!treeItem) return;
-        
-        const kind = treeItem.dataset.kind;
-        const path = treeItem.dataset.path;
-        
-        // Si es archivo, abrir
-        if (kind === 'file') {
-          e.preventDefault();
-          e.stopPropagation();
-          await openFile(path);
-        }
-        // Si es carpeta, el clic en el expand-icon ya tiene su propio listener
-        // pero podemos ignorar aquí
-      });
-
-      // ------------------------------------------------------------
-      // 8. ABRIR ARCHIVO (lectura + modelo Monaco)
-      // ------------------------------------------------------------
-      async function openFile(path) {
-        const fileData = files.find(f => f.path === path);
-        if (!fileData) {
-          showToastMessage('✗ Archivo no encontrado');
-          return;
-        }
-
-        // Si ya está abierto, activarlo
-        const existing = openFiles.find(f => f.path === path);
-        if (existing) {
-          setActiveFile(existing.id);
-          return;
-        }
-
-        // Leer contenido si no está cacheado
-        if (!fileData.content) {
-          try {
-            fileData.content = await readFileContent(fileData.file);
-          } catch (err) {
-            showToastMessage('✗ Error al leer el archivo');
-            return;
-          }
-        }
-
-        // Crear modelo Monaco
-        const model = monaco.editor.createModel(fileData.content, fileData.language);
-        const fileId = 'file-' + Date.now() + '-' + Math.random().toString(36).substring(2);
-
-        const newFile = {
-          id: fileId,
-          path: fileData.path,
-          name: fileData.name,
-          model: model,
-          dirty: false,
-          originalContent: fileData.content
-        };
-
-        // Detectar cambios
-        model.onDidChangeContent(() => {
-          const current = model.getValue();
-          const dirty = current !== newFile.originalContent;
-          if (newFile.dirty !== dirty) {
-            newFile.dirty = dirty;
-            renderTabs();
-          }
-        });
-
-        openFiles.push(newFile);
-        renderTabs();
-        setActiveFile(fileId);
-      }
-
-      function setActiveFile(fileId) {
-        const file = openFiles.find(f => f.id === fileId);
-        if (!file) return;
-        activeFileId = fileId;
-        editor.setModel(file.model);
-        renderTabs();
-        highlightActiveFileInSidebar(file.path);
-      }
-
-      function highlightActiveFileInSidebar(path) {
-        document.querySelectorAll('.tree-item.active').forEach(el => el.classList.remove('active'));
-        const activeEl = document.querySelector(`.tree-item[data-path="${path}"]`);
-        if (activeEl) activeEl.classList.add('active');
-      }
-
-      // ------------------------------------------------------------
-      // 9. PESTAÑAS
-      // ------------------------------------------------------------
-      function renderTabs() {
-        if (openFiles.length === 0) {
-          tabsContainer.innerHTML = '';
-          return;
-        }
-
-        let html = '';
-        openFiles.forEach(file => {
-          const activeClass = (activeFileId === file.id) ? 'active' : '';
-          const dirtyClass = file.dirty ? 'dirty' : '';
-          html += `<div class="tab ${activeClass} ${dirtyClass}" data-file-id="${file.id}">
-            <span class="tab-label">${file.name}</span>
-            <span class="tab-close" data-file-id="${file.id}">
-              <i data-lucide="x"></i>
-            </span>
-          </div>`;
-        });
-        tabsContainer.innerHTML = html;
-
-        // Eventos pestañas
-        tabsContainer.querySelectorAll('.tab').forEach(tab => {
-          tab.addEventListener('click', (e) => {
-            if (e.target.closest('.tab-close')) return;
-            const fid = tab.dataset.fileId;
-            setActiveFile(fid);
-          });
-        });
-
-        tabsContainer.querySelectorAll('.tab-close').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const fid = btn.dataset.fileId;
-            closeTab(fid);
-          });
-        });
-
-        lucide.createIcons();
-      }
-
-      function closeTab(fileId) {
-        const file = openFiles.find(f => f.id === fileId);
-        if (!file) return;
-
-        if (file.dirty) {
-          if (!confirm(`Hay cambios sin guardar en ${file.name}. ¿Cerrar igualmente?`)) return;
-        }
-
-        file.model.dispose();
-        const index = openFiles.findIndex(f => f.id === fileId);
-        if (index !== -1) openFiles.splice(index, 1);
-
-        if (activeFileId === fileId) {
-          if (openFiles.length > 0) {
-            setActiveFile(openFiles[0].id);
-          } else {
-            activeFileId = null;
-            editor.setModel(monaco.editor.createModel('Selecciona un archivo para editar', 'plaintext'));
-          }
-        }
-        renderTabs();
-      }
-
-      // ------------------------------------------------------------
-      // 10. GUARDAR (descarga universal)
-      // ------------------------------------------------------------
-      function saveActiveFile() {
-        if (!activeFileId) {
+      async function saveCurrentFile() {
+        if (!currentFileHandle) {
           showToastMessage('✗ No hay archivo activo');
           return;
         }
-        const file = openFiles.find(f => f.id === activeFileId);
-        if (!file) return;
 
-        const content = file.model.getValue();
-        const blob = new Blob([content], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = file.name;
-        a.click();
-        URL.revokeObjectURL(url);
+        try {
+          // Verificar/solicitar permiso de escritura
+          if (await currentFileHandle.queryPermission({ mode: 'readwrite' }) !== 'granted') {
+            const permission = await currentFileHandle.requestPermission({ mode: 'readwrite' });
+            if (permission !== 'granted') {
+              showToastMessage('✗ Permiso de escritura denegado');
+              return;
+            }
+          }
 
-        file.originalContent = content;
-        file.dirty = false;
-        renderTabs();
-        showToastMessage(`⬇️ ${file.name} guardado (descargado)`);
+          // Flujo exacto: createWritable -> write -> close
+          const writable = await currentFileHandle.createWritable();
+          await writable.write(editor.getValue());
+          await writable.close();
+
+          showToastMessage('✓ Archivo guardado');
+        } catch (err) {
+          console.error(err);
+          showToastMessage('✗ Error al guardar');
+        }
       }
 
       // ------------------------------------------------------------
-      // 11. EVENTOS Y ATALOS DE TECLADO
+      // 11. EVENTOS DE USUARIO (TODAS LAS LLAMADAS CRÍTICAS VAN AQUÍ)
       // ------------------------------------------------------------
       splashOpenBtn.addEventListener('click', openFolder);
       openFolderBtn.addEventListener('click', openFolder);
-      saveBtn.addEventListener('click', saveActiveFile);
+      saveBtn.addEventListener('click', saveCurrentFile);
 
+      // Ctrl + S para guardar
       document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 's') {
           e.preventDefault();
-          saveActiveFile();
+          saveCurrentFile();
         }
       });
 
-      // Inicializar iconos
+      // ------------------------------------------------------------
+      // 12. INICIALIZAR ICONOS Y EDITOR POR DEFECTO
+      // ------------------------------------------------------------
       lucide.createIcons();
+
+      // Crear editor vacío inicial (para que el contenedor no esté vacío)
+      editor = monaco.editor.create(editorContainer, {
+        value: 'Abre una carpeta y selecciona un archivo.',
+        language: 'plaintext',
+        theme: 'vs-dark',
+        automaticLayout: true,
+        fontSize: 14,
+        fontFamily: 'JetBrains Mono, Fira Code, monospace',
+        minimap: { enabled: false }
+      });
     })();
   </script>
 </body>

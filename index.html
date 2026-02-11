@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lightweight Code Editor · Monaco + File System Access</title>
+    <!-- Monaco editor loader from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.34.1/min/vs/loader.js"></script>
+    <style>
+        /* ---------- GLOBAL DARK THEME / FLEXBOX LAYOUT ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'SF Mono', Monaco, 'Cascadia Code', 'Fira Code', monospace;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            background-color: #1e1e1e;
+            color: #cccccc;
+            overflow: hidden;
+        }
+
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            background-color: #1e1e1e;
+        }
+
+        /* ----- TOP TOOLBAR ----- */
+        .toolbar {
+            flex-shrink: 0;
+            background-color: #252526;
+            padding: 8px 16px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            border-bottom: 1px solid #3c3c3d;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+        }
+        .toolbar button {
+            background-color: #0e639c;
+            border: none;
+            color: white;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            letter-spacing: 0.3px;
+            border: 1px solid transparent;
+        }
+        .toolbar button:hover {
+            background-color: #1177bb;
+        }
+        .toolbar button:active {
+            background-color: #0a4f7a;
+        }
+        #current-folder-indicator {
+            color: #cccccc;
+            font-size: 13px;
+            margin-left: 8px;
+            opacity: 0.9;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ----- MAIN ROW (EXPLORER + EDITOR) ----- */
+        .main {
+            display: flex;
+            flex: 1;
+            min-height: 0;    /* flex overflow */
+            background-color: #1e1e1e;
+        }
+
+        /* ---------- LEFT: FILE EXPLORER (DARK TREE) ---------- */
+        .explorer {
+            width: 280px;
+            background-color: #252526;
+            border-right: 1px solid #3c3c3d;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .explorer-header {
+            padding: 12px 16px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            color: #969696;
+            border-bottom: 1px solid #3c3c3d;
+            background-color: #2a2a2a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #tree-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 0 12px 12px;
+            font-size: 13px;
+        }
+        /* tree list styles */
+        .tree {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        .tree ul {
+            list-style: none;
+            padding-left: 20px;
+            margin-left: 4px;
+            border-left: 1px dashed #4a4a4a;
+        }
+        .tree li {
+            margin: 3px 0;
+            white-space: nowrap;
+        }
+        .folder-name {
+            cursor: pointer;
+            color: #d4d4d4;
+            display: inline-block;
+            padding: 4px 8px 4px 4px;
+            border-radius: 3px;
+            user-select: none;
+        }
+        .folder-name:hover {
+            background-color: #2a2d2e;
+        }
+        .file-item {
+            cursor: pointer;
+            padding: 4px 8px 4px 24px;
+            border-radius: 3px;
+            color: #cccccc;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .file-item:hover {
+            background-color: #2a2d2e;
+            color: white;
+        }
+        .hidden {
+            display: none !important;
+        }
+        /* folder icon / file icon */
+        .folder-name::before {
+            content: "📁 ";
+            margin-right: 4px;
+        }
+        .file-item::before {
+            content: "📄 ";
+            margin-right: 6px;
+            opacity: 0.9;
+        }
+
+        /* ---------- CENTER: MONACO EDITOR ---------- */
+        .editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #1e1e1e;
+            position: relative;
+            overflow: hidden;
+        }
+        #editor {
+            width: 100%;
+            height: 100%;
+            min-height: 0;
+        }
+
+        /* ---------- BOTTOM: SIMULATED TERMINAL ---------- */
+        .terminal {
+            flex-shrink: 0;
+            height: 220px;
+            background-color: #0c0c0c;
+            border-top: 2px solid #3c3c3d;
+            display: flex;
+            flex-direction: column;
+            color: #c7c7c7;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+        }
+        .terminal-header {
+            background-color: #2d2d2d;
+            padding: 6px 16px;
+            font-weight: 600;
+            color: #e0e0e0;
+            border-bottom: 1px solid #3f3f3f;
+        }
+        .terminal-output {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 16px;
+            background-color: #0c0c0c;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+        }
+        .terminal-line {
+            color: #b3e6b3;
+            white-space: pre-wrap;
+            word-break: break-all;
+            border-bottom: 1px solid #1e1e1e;
+            padding: 2px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        .terminal-line.error {
+            color: #f48771;
+            background-color: #2d1a1a;
+            padding-left: 4px;
+        }
+        .terminal-line.info {
+            color: #9cdcfe;
+        }
+        .timestamp {
+            color: #6a9955;
+            margin-right: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- toolbar with open folder + save -->
+        <div class="toolbar">
+            <button id="openFolderBtn">📂 Open Folder</button>
+            <button id="saveBtn">💾 Save</button>
+            <span id="current-folder-indicator">⏺ no folder opened</span>
+        </div>
+
+        <!-- main workspace: explorer + editor -->
+        <div class="main">
+            <!-- left file explorer panel -->
+            <div class="explorer">
+                <div class="explorer-header">
+                    <span>EXPLORER</span>
+                </div>
+                <div id="tree-container">
+                    <!-- dynamic file tree injected here -->
+                    <div style="color: #777; padding: 16px; text-align: center;">⏳ Open a folder to start</div>
+                </div>
+            </div>
+
+            <!-- center: monaco editor -->
+            <div class="editor-container">
+                <div id="editor"></div>
+            </div>
+        </div>
+
+        <!-- bottom simulated terminal -->
+        <div class="terminal">
+            <div class="terminal-header">⬢ TERMINAL (simulated)</div>
+            <div id="terminal-output" class="terminal-output">
+                <div class="terminal-line"><span class="timestamp">⚡</span> Welcome. Use "Open Folder" to begin.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function(){
+            "use strict";
+
+            // ---------- GLOBAL STATE ----------
+            let editor;                     // Monaco editor instance
+            let editorReady = false;        // flag if monaco is ready
+            let currentFileHandle = null;   // FileSystemFileHandle for current file
+            let currentDirectoryHandle = null; // root directory handle
+            let fileHandleMap = new Map();  // optional, but we store handles on DOM directly
+
+            // DOM elements
+            const treeContainer = document.getElementById('tree-container');
+            const terminalOutput = document.getElementById('terminal-output');
+            const folderIndicator = document.getElementById('current-folder-indicator');
+            const openFolderBtn = document.getElementById('openFolderBtn');
+            const saveBtn = document.getElementById('saveBtn');
+
+            // ---------- MONACO INIT (VS-DARK THEME) ----------
+            function initMonaco() {
+                // configure AMD paths for monaco CDN
+                require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.34.1/min/vs' } });
+                require(['vs/editor/editor.main'], function() {
+                    // create editor instance
+                    editor = monaco.editor.create(document.getElementById('editor'), {
+                        value: '// select a file from the explorer',
+                        language: 'plaintext',
+                        theme: 'vs-dark',
+                        automaticLayout: true,
+                        wordWrap: 'on',
+                        fontSize: 13,
+                        fontFamily: 'Monaco, "Cascadia Code", "Fira Code", monospace',
+                        minimap: { enabled: false },
+                        scrollBeyondLastLine: false
+                    });
+                    editorReady = true;
+                    logToTerminal('✅ Monaco editor loaded (vs-dark)', 'info');
+                });
+            }
+
+            // ---------- TERMINAL LOGGER (simulated) ----------
+            function logToTerminal(message, type = 'info') {
+                const line = document.createElement('div');
+                line.className = 'terminal-line ' + (type === 'error' ? 'error' : 'info');
+                const now = new Date();
+                const timeStr = `[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}]`;
+                line.innerHTML = `<span class="timestamp">${timeStr}</span> ${message}`;
+                terminalOutput.appendChild(line);
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                // keep last 100 lines
+                if (terminalOutput.children.length > 100) {
+                    terminalOutput.removeChild(terminalOutput.children[0]);
+                }
+            }
+
+            // ---------- UTILS: LANGUAGE FROM EXTENSION ----------
+            function getExtension(filename) {
+                const dotIndex = filename.lastIndexOf('.');
+                return dotIndex === -1 ? '' : filename.slice(dotIndex).toLowerCase();
+            }
+
+            function getLanguageFromExtension(ext) {
+                const map = {
+                    '.js': 'javascript', '.ts': 'typescript', '.jsx': 'javascript', '.tsx': 'typescript',
+                    '.html': 'html', '.htm': 'html', '.css': 'css', '.scss': 'scss', '.less': 'less',
+                    '.json': 'json', '.xml': 'xml', '.yaml': 'yaml', '.yml': 'yaml',
+                    '.md': 'markdown', '.py': 'python', '.rb': 'ruby', '.php': 'php',
+                    '.java': 'java', '.c': 'c', '.cpp': 'cpp', '.h': 'cpp', '.cs': 'csharp',
+                    '.go': 'go', '.rs': 'rust', '.swift': 'swift', '.kt': 'kotlin',
+                    '.sh': 'shell', '.bash': 'shell', '.bat': 'bat', '.ps1': 'powershell',
+                    '.sql': 'sql', '.txt': 'plaintext', '.log': 'plaintext'
+                };
+                return map[ext] || 'plaintext';
+            }
+
+            // ---------- READ FILE AND SET INTO EDITOR ----------
+            async function openFile(fileElement) {
+                if (!editorReady) {
+                    logToTerminal('⌛ Editor not ready, please wait...', 'error');
+                    return;
+                }
+                const fileHandle = fileElement.fileHandle; // stored as property
+                if (!fileHandle) return;
+
+                try {
+                    const file = await fileHandle.getFile();
+                    const content = await file.text();
+                    // set editor value
+                    editor.setValue(content);
+                    // set current file handle
+                    currentFileHandle = fileHandle;
+                    // detect language and set monaco language
+                    const ext = getExtension(fileHandle.name);
+                    const lang = getLanguageFromExtension(ext);
+                    monaco.editor.setModelLanguage(editor.getModel(), lang);
+                    // log action
+                    logToTerminal(`📂 Opened: ${fileHandle.name} (${lang})`, 'info');
+                    // update indicator
+                    folderIndicator.textContent = `📁 ${currentDirectoryHandle?.name || ''} · ${fileHandle.name}`;
+                } catch (err) {
+                    logToTerminal(`❌ Error opening file: ${err.message}`, 'error');
+                }
+            }
+
+            // ---------- SAVE CURRENT FILE ----------
+            async function saveCurrentFile() {
+                if (!currentFileHandle) {
+                    logToTerminal('⚠ No file open — use Save on an opened file', 'error');
+                    return;
+                }
+                if (!editorReady) return;
+                try {
+                    const content = editor.getValue();
+                    // create writable stream
+                    const writable = await currentFileHandle.createWritable();
+                    await writable.write(content);
+                    await writable.close();
+                    logToTerminal(`💾 Saved: ${currentFileHandle.name}`, 'info');
+                } catch (err) {
+                    logToTerminal(`❌ Save failed: ${err.message}`, 'error');
+                }
+            }
+
+            // ---------- BUILD DIRECTORY TREE (RECURSIVE) ----------
+            async function processDirectory(dirHandle, parentUl, currentPath) {
+                // iterate over all entries
+                for await (const entry of dirHandle.values()) {
+                    const li = document.createElement('li');
+                    if (entry.kind === 'directory') {
+                        // 📁 folder
+                        li.classList.add('folder');
+                        const folderSpan = document.createElement('span');
+                        folderSpan.classList.add('folder-name');
+                        folderSpan.textContent = entry.name; // icon via ::before
+                        li.appendChild(folderSpan);
+                        const childUl = document.createElement('ul');
+                        childUl.classList.add('tree', 'nested');
+                        li.appendChild(childUl);
+                        parentUl.appendChild(li);
+                        // recursive read subfolder
+                        await processDirectory(entry, childUl, currentPath + entry.name + '/');
+                    } else {
+                        // 📄 file
+                        li.classList.add('file-item');
+                        li.textContent = entry.name; // icon via ::before
+                        // store FileSystemFileHandle on the DOM element
+                        li.fileHandle = entry;
+                        li.dataset.path = currentPath + entry.name;
+                        li.dataset.extension = getExtension(entry.name);
+                        parentUl.appendChild(li);
+                    }
+                }
+            }
+
+            // ---------- OPEN FOLDER (FILE SYSTEM ACCESS API) ----------
+            async function openFolderHandler() {
+                if (!window.showDirectoryPicker) {
+                    logToTerminal('❌ File System Access API not supported. Use Chrome/Edge with localhost or HTTPS.', 'error');
+                    return;
+                }
+                try {
+                    // request folder
+                    const dirHandle = await window.showDirectoryPicker();
+                    currentDirectoryHandle = dirHandle;
+                    folderIndicator.textContent = `📁 ${dirHandle.name}`;
+                    logToTerminal(`📂 Folder opened: ${dirHandle.name}`, 'info');
+
+                    // reset UI: clear tree, clear current file
+                    treeContainer.innerHTML = '';
+                    currentFileHandle = null;
+
+                    // create root <ul>
+                    const rootUl = document.createElement('ul');
+                    rootUl.classList.add('tree');
+                    await processDirectory(dirHandle, rootUl, '');
+                    treeContainer.appendChild(rootUl);
+
+                    // if no files/folders: show placeholder
+                    if (rootUl.children.length === 0) {
+                        treeContainer.innerHTML = '<div style="color: #777; padding: 16px;">📁 folder is empty</div>';
+                    }
+                } catch (err) {
+                    // user abort or other error
+                    if (err.name !== 'AbortError') {
+                        logToTerminal(`❌ Error opening folder: ${err.message}`, 'error');
+                    }
+                }
+            }
+
+            // ---------- EVENT DELEGATION: TREE CLICKS (collapsible + file open) ----------
+            function attachTreeEvents() {
+                treeContainer.addEventListener('click', async (e) => {
+                    // FOLDER COLLAPSE/EXPAND
+                    const folderName = e.target.closest('.folder-name');
+                    if (folderName) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const parentLi = folderName.closest('li');
+                        const childUl = parentLi.querySelector('ul');
+                        if (childUl) {
+                            childUl.classList.toggle('hidden');
+                        }
+                        return;
+                    }
+
+                    // FILE OPEN
+                    const fileItem = e.target.closest('.file-item');
+                    if (fileItem) {
+                        e.preventDefault();
+                        await openFile(fileItem);
+                    }
+                });
+            }
+
+            // ---------- CHECK FOR FS API SUPPORT ON LOAD ----------
+            if (!window.showDirectoryPicker) {
+                logToTerminal('⚠ File System Access API unavailable – run on localhost or HTTPS', 'error');
+            }
+
+            // ---------- INITIALISE MONACO, ATTACH LISTENERS ----------
+            initMonaco();
+
+            // setup event listeners
+            openFolderBtn.addEventListener('click', openFolderHandler);
+            saveBtn.addEventListener('click', saveCurrentFile);
+            attachTreeEvents();
+
+            // (optional) if user clicks on empty tree, do nothing
+            // also handle cleanup: but we keep it simple
+
+            // ---------- LITTLE HELPER: CLEAR TERMINAL? not needed but nice: double click terminal header to clear
+            document.querySelector('.terminal-header').addEventListener('dblclick', function() {
+                terminalOutput.innerHTML = '<div class="terminal-line"><span class="timestamp">⚡</span> terminal cleared</div>';
+            });
+
+            // ---------- EXPOSE SOME STATE TO CONSOLE (DEBUG, NOT REQUIRED) ----------
+            window.__editorApp = { get editor() { return editor; } };
+        })();
+    </script>
+
+    <!--
+        ⚡ Lightweight web code editor 
+        - Monaco from CDN, dark theme, flexbox 
+        - File System Access API: open folder, tree view, save 
+        - Simulated terminal with logs 
+        - Pure vanilla JS, no frameworks 
+        - Compatible with Chrome / Edge (secure context)
+        - Collapsible folders, language detection, error handling
+    -->
+</body>
+</html>

@@ -2,117 +2,265 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-  <title>NEXEDIT · Editor profesional universal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+  <title>NEXEDIT · Editor profesional</title>
   <!-- Monaco Editor -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/min/vs/editor/editor.main.css" />
   <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/min/vs/loader.js"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    /* ----- RESET & VARIABLES ----- */
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
-    body { background: #1e1e1e; height: 100vh; overflow: hidden; color: #d4d4d4; }
-    
-    /* ----- SPLASH ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    body {
+      background: #1e1e1e;
+      height: 100vh;
+      overflow: hidden;
+      color: #d4d4d4;
+    }
+    /* SPLASH */
     .splash {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: #1e1e1e; display: flex; align-items: center; justify-content: center;
-      z-index: 2000; animation: fadeIn 0.2s ease;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #1e1e1e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
     }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .splash-content { text-align: center; max-width: 480px; padding: 32px; }
-    .splash-content h1 { font-size: 48px; font-weight: 500; color: #fff; margin-bottom: 12px; }
-    .subtitle { font-size: 16px; color: #a0a0a0; margin-bottom: 32px; }
+    .splash-content {
+      text-align: center;
+      padding: 32px;
+    }
+    .splash-content h1 {
+      font-size: 48px;
+      font-weight: 500;
+      color: white;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      color: #a0a0a0;
+      margin-bottom: 32px;
+      font-size: 16px;
+    }
     .btn-primary {
-      background: #007acc; color: white; border: none; padding: 12px 32px;
-      border-radius: 6px; font-size: 16px; display: inline-flex; align-items: center;
-      gap: 10px; cursor: pointer; transition: 0.15s;
+      background: #007acc;
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 6px;
+      font-size: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
     }
-    .btn-primary:hover { background: #005fa3; }
-    
-    /* ----- APLICACIÓN PRINCIPAL ----- */
-    .app { display: grid; grid-template-rows: 52px 1fr; height: 100vh; width: 100vw; background: #1e1e1e; }
-    .hidden { display: none !important; }
-    
-    /* ----- TOPBAR ----- */
+    .btn-primary:hover {
+      background: #005fa3;
+    }
+    /* APP */
+    .app {
+      display: grid;
+      grid-template-rows: 52px 1fr;
+      height: 100vh;
+      width: 100vw;
+      background: #1e1e1e;
+    }
+    .hidden {
+      display: none !important;
+    }
+    /* TOPBAR */
     .topbar {
-      background: #2d2d2d; border-bottom: 1px solid #333;
-      display: flex; align-items: center; justify-content: space-between; padding: 0 12px;
+      background: #2d2d2d;
+      border-bottom: 1px solid #333;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
     }
-    .topbar-left { display: flex; align-items: center; gap: 6px; font-weight: 500; }
-    .logo-icon { color: #007acc; width: 20px; height: 20px; }
-    .app-name { font-size: 15px; }
-    .topbar-center { flex: 0 1 300px; margin: 0 10px; }
-    .search-container {
-      display: flex; align-items: center; background: #3a3a3a;
-      border-radius: 6px; padding: 4px 10px; border: 1px solid #4a4a4a;
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
     }
-    .search-icon { width: 16px; height: 16px; color: #a0a0a0; margin-right: 6px; }
-    #search-input { background: transparent; border: none; color: #f0f0f0; width: 100%; font-size: 14px; outline: none; }
-    .topbar-right { display: flex; gap: 6px; }
+    .logo-icon {
+      color: #007acc;
+      width: 20px;
+      height: 20px;
+    }
+    .app-name {
+      font-size: 15px;
+    }
+    .topbar-right {
+      display: flex;
+      gap: 8px;
+    }
     .btn {
-      background: transparent; border: none; color: #d4d4d4;
-      display: flex; align-items: center; gap: 6px; padding: 6px 12px;
-      border-radius: 4px; font-size: 13px; cursor: pointer; transition: 0.1s;
+      background: transparent;
+      border: none;
+      color: #d4d4d4;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.1s;
     }
-    .btn:hover { background: #3e3e3e; }
-    .btn i { width: 16px; height: 16px; }
-    
-    /* ----- WORKSPACE (sidebar + editor) ----- */
-    .workspace { display: grid; grid-template-columns: 280px 1fr; overflow: hidden; }
-    @media (max-width: 640px) { .workspace { grid-template-columns: 1fr; } .sidebar { display: none; } }
-    
-    /* ----- SIDEBAR ----- */
+    .btn:hover {
+      background: #3e3e3e;
+    }
+    .btn i {
+      width: 16px;
+      height: 16px;
+    }
+    /* WORKSPACE */
+    .workspace {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      overflow: hidden;
+    }
+    @media (max-width: 640px) {
+      .workspace { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+    }
+    /* SIDEBAR */
     .sidebar {
-      background: #252526; border-right: 1px solid #333;
-      overflow-y: auto; padding: 12px 0; font-size: 13px;
+      background: #252526;
+      border-right: 1px solid #333;
+      overflow-y: auto;
+      padding: 16px 0;
     }
-    .tree, .tree ul { list-style: none; padding-left: 0; }
-    .tree ul { padding-left: 18px; }
+    .tree {
+      list-style: none;
+      padding-left: 0;
+    }
+    .tree ul {
+      list-style: none;
+      padding-left: 20px;
+    }
     .tree-item {
-      display: flex; align-items: center; gap: 6px; padding: 0 8px 0 2px;
-      min-height: 28px; border-radius: 4px; cursor: pointer; color: #ccc;
-      transition: background 0.1s; white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 8px 0 4px;
+      min-height: 28px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #ccc;
+      transition: background 0.1s;
+      white-space: nowrap;
     }
-    .tree-item:hover { background: #2a2d2e; }
-    .tree-item.active { background: #2a3f4f; color: white; }
-    .tree-item i { width: 16px; height: 16px; flex-shrink: 0; }
+    .tree-item:hover {
+      background: #2a2d2e;
+    }
+    .tree-item.active {
+      background: #2a3f4f;
+      color: white;
+    }
+    .tree-item i {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
     .expand-icon {
-      display: flex; align-items: center; justify-content: center;
-      width: 20px; height: 20px; color: #b0b0b0; cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      color: #b0b0b0;
+      cursor: pointer;
     }
-    .file-name { flex: 1; overflow: hidden; text-overflow: ellipsis; }
-    
-    /* ----- EDITOR AREA ----- */
-    .editor-area { display: grid; grid-template-rows: 36px 1fr; background: #1e1e1e; overflow: hidden; }
+    .file-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    /* EDITOR */
+    .editor-area {
+      display: grid;
+      grid-template-rows: 36px 1fr;
+      background: #1e1e1e;
+      overflow: hidden;
+    }
     .tabs {
-      display: flex; background: #252526; border-bottom: 1px solid #333;
-      overflow-x: auto; overflow-y: hidden;
+      display: flex;
+      background: #252526;
+      border-bottom: 1px solid #333;
+      overflow-x: auto;
     }
     .tab {
-      display: flex; align-items: center; gap: 8px; padding: 0 12px;
-      background: #2d2d2d; border-right: 1px solid #3e3e3e;
-      color: #b0b0b0; font-size: 13px; height: 36px; cursor: pointer; white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+      background: #2d2d2d;
+      border-right: 1px solid #3e3e3e;
+      color: #b0b0b0;
+      font-size: 13px;
+      height: 36px;
+      cursor: pointer;
+      white-space: nowrap;
     }
-    .tab.active { background: #1e1e1e; color: #fff; border-bottom: 2px solid #007acc; }
-    .tab.dirty .tab-label::after { content: "●"; margin-left: 6px; font-size: 12px; color: #ff9800; }
-    .tab-close { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 4px; }
-    .tab-close:hover { background: #4a4a4a; color: white; }
-    .tab-close i { width: 14px; height: 14px; }
-    #editor-container { width: 100%; height: 100%; background: #1e1e1e; }
-    
-    /* ----- TOAST ----- */
+    .tab.active {
+      background: #1e1e1e;
+      color: white;
+      border-bottom: 2px solid #007acc;
+    }
+    .tab.dirty .tab-label::after {
+      content: "●";
+      margin-left: 6px;
+      font-size: 12px;
+      color: #ff9800;
+    }
+    .tab-close {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+    }
+    .tab-close:hover {
+      background: #4a4a4a;
+      color: white;
+    }
+    .tab-close i {
+      width: 14px;
+      height: 14px;
+    }
+    #editor-container {
+      width: 100%;
+      height: 100%;
+      background: #1e1e1e;
+    }
+    /* TOAST */
     .toast {
-      position: fixed; bottom: 24px; right: 24px; background: #2d2d2d;
-      border-left: 4px solid #007acc; padding: 12px 20px; border-radius: 4px;
-      font-size: 14px; color: #e0e0e0; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      z-index: 3000; transition: opacity 0.2s;
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #2d2d2d;
+      border-left: 4px solid #007acc;
+      padding: 12px 20px;
+      border-radius: 4px;
+      font-size: 14px;
+      color: #e0e0e0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 3000;
     }
   </style>
 </head>
 <body>
-  <!-- SPLASH SCREEN -->
+  <!-- SPLASH -->
   <div id="splash-screen" class="splash">
     <div class="splash-content">
       <h1>NEXEDIT</h1>
@@ -123,18 +271,12 @@
     </div>
   </div>
 
-  <!-- APLICACIÓN PRINCIPAL -->
+  <!-- APLICACIÓN -->
   <div id="app" class="app hidden">
     <header class="topbar">
       <div class="topbar-left">
         <i data-lucide="code-2" class="logo-icon"></i>
         <span class="app-name">NEXEDIT</span>
-      </div>
-      <div class="topbar-center">
-        <div class="search-container">
-          <i data-lucide="search" class="search-icon"></i>
-          <input type="text" id="search-input" placeholder="Buscar archivos (Ctrl+P)" />
-        </div>
       </div>
       <div class="topbar-right">
         <button id="save-btn" class="btn" title="Guardar (Ctrl+S)">
@@ -155,152 +297,24 @@
     </div>
   </div>
 
-  <!-- INPUT OCULTO PARA SELECCIONAR CARPETA (webkitdirectory) -->
+  <!-- INPUT SELECCIÓN DE CARPETA -->
   <input type="file" id="folder-picker" webkitdirectory style="display: none;" />
 
-  <!-- TOAST NOTIFICACIÓN -->
-  <div id="save-toast" class="toast hidden">✓ Listo</div>
+  <!-- TOAST -->
+  <div id="save-toast" class="toast hidden">✓ Archivo guardado</div>
 
   <script>
     (async function() {
       // ------------------------------------------------------------
-      //  MONACO INIT
+      // 1. INICIALIZAR MONACO
       // ------------------------------------------------------------
-      const monacoReady = new Promise((resolve) => {
+      await new Promise((resolve) => {
         require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/min/vs' } });
-        require(['vs/editor/editor.main'], function() { resolve(window.monaco); });
+        require(['vs/editor/editor.main'], () => resolve());
       });
-      const monaco = await monacoReady;
 
       // ------------------------------------------------------------
-      //  ESTADO GLOBAL CON INDEXEDDB (PERSISTENCIA)
-      // ------------------------------------------------------------
-      const DB_NAME = 'NexEditDB';
-      const DB_VERSION = 1;
-      const STORE_NAME = 'workspace';
-
-      class PersistentState {
-        constructor() {
-          this.db = null;
-          this.files = [];              // todos los archivos de la carpeta (metadata + contenido)
-          this.openFiles = [];          // archivos abiertos (referencias a files)
-          this.activeFileId = null;
-          this.expandedPaths = new Set(['']);
-          this.searchQuery = '';
-          this.currentFolderName = '';
-        }
-
-        async init() {
-          await this._initDB();
-          await this._loadFromDB();
-        }
-
-        _initDB() {
-          return new Promise((resolve, reject) => {
-            const req = indexedDB.open(DB_NAME, DB_VERSION);
-            req.onerror = () => reject(req.error);
-            req.onsuccess = () => { this.db = req.result; resolve(); };
-            req.onupgradeneeded = (e) => {
-              const db = e.target.result;
-              if (!db.objectStoreNames.contains(STORE_NAME)) {
-                db.createObjectStore(STORE_NAME);
-              }
-            };
-          });
-        }
-
-        async _saveToDB() {
-          if (!this.db) return;
-          const tx = this.db.transaction(STORE_NAME, 'readwrite');
-          const store = tx.objectStore(STORE_NAME);
-          // Guardamos solo lo serializable: metadata, contenido, rutas expandidas, etc.
-          const serializable = {
-            files: this.files.map(f => ({
-              name: f.name,
-              path: f.path,
-              content: f.content,
-              language: f.language,
-              dirty: f.dirty || false,
-              originalContent: f.originalContent
-            })),
-            openFilesPaths: this.openFiles.map(f => f.path),
-            activeFilePath: this.activeFileId ? this.openFiles.find(f => f.id === this.activeFileId)?.path : null,
-            expandedPaths: Array.from(this.expandedPaths),
-            currentFolderName: this.currentFolderName
-          };
-          store.put(serializable, 'current');
-          await tx.done;
-        }
-
-        async _loadFromDB() {
-          if (!this.db) return false;
-          const tx = this.db.transaction(STORE_NAME, 'readonly');
-          const store = tx.objectStore(STORE_NAME);
-          const data = await new Promise((resolve) => {
-            const req = store.get('current');
-            req.onsuccess = () => resolve(req.result);
-            req.onerror = () => resolve(null);
-          });
-          if (!data) return false;
-          
-          // Restaurar files (pero sin los File objects, se perderán; los recrearemos al abrir carpeta)
-          this.files = (data.files || []).map(f => ({ ...f, handle: null, model: null, id: null }));
-          this.expandedPaths = new Set(data.expandedPaths || ['']);
-          this.currentFolderName = data.currentFolderName || '';
-          // No restauramos openFiles ni activeFile porque necesitan los File handles, eso se hará después
-          return true;
-        }
-
-        // Métodos para modificar y persistir
-        setFiles(newFiles) {
-          this.files = newFiles;
-          this._saveToDB();
-        }
-
-        addOpenFile(file) {
-          this.openFiles.push(file);
-          this._saveToDB();
-        }
-
-        removeOpenFile(fileId) {
-          this.openFiles = this.openFiles.filter(f => f.id !== fileId);
-          this._saveToDB();
-        }
-
-        updateFileDirty(fileId, dirty) {
-          const f = this.openFiles.find(f => f.id === fileId);
-          if (f) { f.dirty = dirty; this._saveToDB(); }
-        }
-
-        setActiveFile(fileId) {
-          this.activeFileId = fileId;
-          this._saveToDB();
-        }
-
-        setExpanded(path, expanded) {
-          if (expanded) this.expandedPaths.add(path);
-          else this.expandedPaths.delete(path);
-          this._saveToDB();
-        }
-
-        clearWorkspace() {
-          this.files = [];
-          this.openFiles.forEach(f => f.model?.dispose());
-          this.openFiles = [];
-          this.activeFileId = null;
-          this.expandedPaths = new Set(['']);
-          this.currentFolderName = '';
-          // Borrar de DB
-          const tx = this.db.transaction(STORE_NAME, 'readwrite');
-          tx.objectStore(STORE_NAME).delete('current');
-        }
-      }
-
-      const state = new PersistentState();
-      await state.init();
-
-      // ------------------------------------------------------------
-      //  ELEMENTOS DOM
+      // 2. ELEMENTOS DOM
       // ------------------------------------------------------------
       const splash = document.getElementById('splash-screen');
       const appEl = document.getElementById('app');
@@ -311,16 +325,22 @@
       const saveBtn = document.getElementById('save-btn');
       const openFolderBtn = document.getElementById('open-folder-btn');
       const splashOpenBtn = document.getElementById('splash-open-folder');
-      const searchInput = document.getElementById('search-input');
       const toast = document.getElementById('save-toast');
 
-      let editorInstance = null;
-      let currentFileHandles = new Map(); // path -> File (objeto File)
+      // ------------------------------------------------------------
+      // 3. ESTADO GLOBAL (SENCILLO Y DIRECTO)
+      // ------------------------------------------------------------
+      let files = [];                 // Todos los archivos de la carpeta { name, path, fileObject, content, language }
+      let openFiles = [];            // Archivos abiertos { id, name, path, model, dirty, originalContent }
+      let activeFileId = null;
+      let expandedFolders = new Set(['']); // Rutas expandidas
+
+      let editor = null;
 
       // ------------------------------------------------------------
-      //  UTILIDADES
+      // 4. FUNCIONES AUXILIARES
       // ------------------------------------------------------------
-      function showToast(msg, duration = 2000) {
+      function showToastMessage(msg, duration = 2000) {
         toast.textContent = msg;
         toast.classList.remove('hidden');
         setTimeout(() => toast.classList.add('hidden'), duration);
@@ -339,7 +359,7 @@
       }
 
       // ------------------------------------------------------------
-      //  APERTURA DE CARPETA (webkitdirectory) - UNIVERSAL
+      // 5. APERTURA DE CARPETA (UNIVERSAL)
       // ------------------------------------------------------------
       function openFolder() {
         folderPicker.click();
@@ -349,39 +369,32 @@
         const fileList = e.target.files;
         if (!fileList || fileList.length === 0) return;
 
-        // Limpiar estado anterior
-        state.clearWorkspace();
-        currentFileHandles.clear();
+        // Resetear estado
+        files = [];
+        openFiles.forEach(f => f.model?.dispose());
+        openFiles = [];
+        activeFileId = null;
+        expandedFolders = new Set(['']);
 
-        const rootName = fileList[0].webkitRelativePath.split('/')[0];
-        state.currentFolderName = rootName;
-
-        // Crear array de archivos plano
-        const newFiles = [];
+        // Leer todos los archivos
         for (let i = 0; i < fileList.length; i++) {
           const file = fileList[i];
           const path = file.webkitRelativePath;
-          newFiles.push({
-            id: null,                 // se asigna al abrir
+          files.push({
             name: file.name,
             path: path,
-            handle: file,            // objeto File
-            content: null,          // se leerá bajo demanda
-            model: null,
-            dirty: false,
-            originalContent: null,
+            fileObject: file,
+            content: null,
             language: getLanguageFromExtension(file.name)
           });
-          currentFileHandles.set(path, file);
         }
 
-        // Ordenar por path para un árbol ordenado
-        newFiles.sort((a, b) => a.path.localeCompare(b.path));
-        state.setFiles(newFiles);
+        // Ordenar para que carpetas aparezcan antes (alfabético)
+        files.sort((a, b) => a.path.localeCompare(b.path));
 
         // Inicializar editor si no existe
-        if (!editorInstance) {
-          editorInstance = monaco.editor.create(editorContainer, {
+        if (!editor) {
+          editor = monaco.editor.create(editorContainer, {
             value: 'Selecciona un archivo para editar',
             language: 'plaintext',
             theme: 'vs-dark',
@@ -391,103 +404,84 @@
             minimap: { enabled: false }
           });
         } else {
-          editorInstance.setModel(monaco.editor.createModel('Selecciona un archivo para editar', 'plaintext'));
+          editor.setModel(monaco.editor.createModel('Selecciona un archivo para editar', 'plaintext'));
         }
 
-        // Mostrar workspace y ocultar splash
+        // Ocultar splash y mostrar app
         splash.classList.add('hidden');
         appEl.classList.remove('hidden');
 
-        // Renderizar árbol y pestañas
-        await renderSidebar();
-        renderTabs();
-        showToast(`Carpeta abierta: ${rootName} (${newFiles.length} archivos)`);
+        // Renderizar árbol
+        renderTree();
+        showToastMessage(`Carpeta abierta: ${files[0]?.path.split('/')[0] || 'carpeta'} (${files.length} archivos)`);
+        lucide.createIcons();
       });
 
       // ------------------------------------------------------------
-      //  RENDERIZADO DEL ÁRBOL (eficiente, con reutilización)
+      // 6. RENDERIZADO DEL ÁRBOL (SIN COMPLICACIONES)
       // ------------------------------------------------------------
-      async function renderSidebar() {
-        if (!sidebarEl) return;
+      function renderTree() {
         const rootUl = document.createElement('ul');
         rootUl.className = 'tree';
-        await buildTreeItems(rootUl, '');
+        buildTree(rootUl, '');
         sidebarEl.innerHTML = '';
         sidebarEl.appendChild(rootUl);
-        lucide.createIcons();
-        // Restaurar archivo activo resaltado
-        if (state.activeFileId) {
-          const activeFile = state.openFiles.find(f => f.id === state.activeFileId);
-          if (activeFile) highlightInSidebar(activeFile.path);
-        }
       }
 
-      async function buildTreeItems(parentUl, basePath) {
-        // Obtener todos los paths únicos de archivos y directorios
-        const allPaths = new Set();
-        state.files.forEach(f => {
-          const parts = f.path.split('/');
+      function buildTree(parentUl, basePath) {
+        // Obtener nombres inmediatos (archivos y carpetas) dentro de basePath
+        const children = new Map(); // nombre -> { isDirectory, fullPath }
+
+        files.forEach(file => {
+          const parts = file.path.split('/');
           let current = '';
           for (let i = 0; i < parts.length; i++) {
-            current = current ? current + '/' + parts[i] : parts[i];
-            allPaths.add(current);
+            const part = parts[i];
+            const prev = current;
+            current = current ? `${current}/${part}` : part;
+            if (current === basePath) continue;
+            if (prev === basePath || (basePath === '' && i === 0)) {
+              // Es hijo directo
+              const name = part;
+              const fullPath = current;
+              const isDir = i < parts.length - 1;
+              if (!children.has(fullPath)) {
+                children.set(fullPath, { name, fullPath, isDir });
+              }
+            }
           }
         });
 
-        const currentPrefix = basePath ? basePath + '/' : '';
-        const childNames = new Set();
-
-        Array.from(allPaths).forEach(p => {
-          if (!p.startsWith(currentPrefix)) return;
-          const rest = p.slice(currentPrefix.length);
-          if (rest && !rest.includes('/')) {
-            childNames.add(rest);
-          } else if (rest && rest.includes('/')) {
-            const first = rest.split('/')[0];
-            childNames.add(first);
-          }
+        // Convertir a array y ordenar (carpetas primero, luego archivos)
+        const sorted = Array.from(children.values()).sort((a, b) => {
+          if (a.isDir && !b.isDir) return -1;
+          if (!a.isDir && b.isDir) return 1;
+          return a.name.localeCompare(b.name);
         });
 
-        const sorted = Array.from(childNames).sort((a, b) => {
-          const aIsDir = !state.files.some(f => f.path === (basePath ? `${basePath}/${a}` : a));
-          const bIsDir = !state.files.some(f => f.path === (basePath ? `${basePath}/${b}` : b));
-          if (aIsDir && !bIsDir) return -1;
-          if (!aIsDir && bIsDir) return 1;
-          return a.localeCompare(b);
-        });
-
-        for (const name of sorted) {
-          const fullPath = basePath ? `${basePath}/${name}` : name;
-          const isDirectory = !state.files.some(f => f.path === fullPath);
+        sorted.forEach(item => {
           const li = document.createElement('li');
           const div = document.createElement('div');
           div.className = 'tree-item';
-          div.dataset.path = fullPath;
-          div.dataset.kind = isDirectory ? 'directory' : 'file';
+          div.dataset.path = item.fullPath;
+          div.dataset.kind = item.isDir ? 'directory' : 'file';
 
-          // Expand/colapsar
-          if (isDirectory) {
+          // Espaciador/expansor
+          if (item.isDir) {
             const expandSpan = document.createElement('span');
             expandSpan.className = 'expand-icon';
-            const isExpanded = state.expandedPaths.has(fullPath);
+            const isExpanded = expandedFolders.has(item.fullPath);
             const expandIcon = document.createElement('i');
             expandIcon.dataset.lucide = isExpanded ? 'chevron-down' : 'chevron-right';
             expandSpan.appendChild(expandIcon);
-            expandSpan.addEventListener('click', async (e) => {
+            expandSpan.addEventListener('click', (e) => {
               e.stopPropagation();
-              const expanded = !state.expandedPaths.has(fullPath);
-              state.setExpanded(fullPath, expanded);
-              // Actualizar icono y añadir/quitar hijos sin re-renderizar todo
-              const ul = li.querySelector('ul');
-              if (expanded && !ul) {
-                const newUl = document.createElement('ul');
-                await buildTreeItems(newUl, fullPath);
-                li.appendChild(newUl);
-              } else if (!expanded && ul) {
-                ul.remove();
+              if (expandedFolders.has(item.fullPath)) {
+                expandedFolders.delete(item.fullPath);
+              } else {
+                expandedFolders.add(item.fullPath);
               }
-              expandIcon.dataset.lucide = expanded ? 'chevron-down' : 'chevron-right';
-              lucide.createIcons({ root: li });
+              renderTree(); // Simplificado: re-render todo
             });
             div.appendChild(expandSpan);
           } else {
@@ -499,8 +493,8 @@
 
           // Icono
           const icon = document.createElement('i');
-          if (isDirectory) {
-            icon.dataset.lucide = state.expandedPaths.has(fullPath) ? 'folder-open' : 'folder';
+          if (item.isDir) {
+            icon.dataset.lucide = expandedFolders.has(item.fullPath) ? 'folder-open' : 'folder';
           } else {
             icon.dataset.lucide = 'file';
           }
@@ -509,80 +503,84 @@
           // Nombre
           const nameSpan = document.createElement('span');
           nameSpan.className = 'file-name';
-          nameSpan.textContent = name;
+          nameSpan.textContent = item.name;
           div.appendChild(nameSpan);
 
-          // Click en archivo
-          if (!isDirectory) {
+          // Evento click para archivos
+          if (!item.isDir) {
             div.addEventListener('click', (e) => {
               if (e.target.closest('.expand-icon')) return;
-              openFileByPath(fullPath);
+              openFile(item.fullPath);
             });
           }
 
           li.appendChild(div);
 
-          // Si es directorio y expandido, añadir hijos
-          if (isDirectory && state.expandedPaths.has(fullPath)) {
+          // Si es carpeta y está expandida, renderizar hijos
+          if (item.isDir && expandedFolders.has(item.fullPath)) {
             const childUl = document.createElement('ul');
-            await buildTreeItems(childUl, fullPath);
+            buildTree(childUl, item.fullPath);
             li.appendChild(childUl);
           }
 
           parentUl.appendChild(li);
-        }
+        });
       }
 
       // ------------------------------------------------------------
-      //  ABRIR ARCHIVO
+      // 7. ABRIR ARCHIVO (LECTURA Y MONACO)
       // ------------------------------------------------------------
-      async function openFileByPath(path) {
-        let file = state.files.find(f => f.path === path);
-        if (!file) return;
+      async function openFile(path) {
+        // Buscar archivo en la lista
+        const fileData = files.find(f => f.path === path);
+        if (!fileData) return;
 
-        // Si ya está abierto, activar
-        const existing = state.openFiles.find(f => f.path === path);
+        // Verificar si ya está abierto
+        const existing = openFiles.find(f => f.path === path);
         if (existing) {
           setActiveFile(existing.id);
           return;
         }
 
         // Leer contenido si no está en caché
-        if (!file.content) {
+        if (!fileData.content) {
           try {
-            file.content = await readFileContent(file.handle);
-          } catch (e) {
-            console.error('Error al leer archivo', e);
-            showToast('✗ No se pudo leer el archivo', 2000);
+            fileData.content = await readFile(fileData.fileObject);
+          } catch (err) {
+            showToastMessage('✗ Error al leer el archivo');
             return;
           }
-          file.originalContent = file.content;
         }
 
         // Crear modelo Monaco
-        const model = monaco.editor.createModel(file.content, file.language);
-        file.model = model;
-        file.dirty = false;
-        const fileId = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + file.name;
-        file.id = fileId;
+        const model = monaco.editor.createModel(fileData.content, fileData.language);
+        const fileId = 'file-' + Date.now() + '-' + Math.random().toString(36).substring(2);
+
+        const newFile = {
+          id: fileId,
+          name: fileData.name,
+          path: path,
+          model: model,
+          dirty: false,
+          originalContent: fileData.content
+        };
 
         // Detectar cambios
         model.onDidChangeContent(() => {
           const current = model.getValue();
-          const dirty = current !== file.originalContent;
-          if (file.dirty !== dirty) {
-            file.dirty = dirty;
-            state.updateFileDirty(file.id, dirty);
+          const dirty = current !== newFile.originalContent;
+          if (newFile.dirty !== dirty) {
+            newFile.dirty = dirty;
             renderTabs();
           }
         });
 
-        state.addOpenFile(file);
+        openFiles.push(newFile);
         renderTabs();
         setActiveFile(fileId);
       }
 
-      function readFileContent(file) {
+      function readFile(file) {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = (e) => resolve(e.target.result);
@@ -592,33 +590,32 @@
       }
 
       function setActiveFile(fileId) {
-        const file = state.openFiles.find(f => f.id === fileId);
+        const file = openFiles.find(f => f.id === fileId);
         if (!file) return;
-        state.setActiveFile(fileId);
-        editorInstance.setModel(file.model);
+        activeFileId = fileId;
+        editor.setModel(file.model);
         renderTabs();
-        highlightInSidebar(file.path);
+        highlightActiveFileInSidebar(file.path);
       }
 
-      function highlightInSidebar(path) {
+      function highlightActiveFileInSidebar(path) {
         document.querySelectorAll('.tree-item.active').forEach(el => el.classList.remove('active'));
-        const el = document.querySelector(`.tree-item[data-path="${path}"]`);
-        if (el) el.classList.add('active');
+        const activeEl = document.querySelector(`.tree-item[data-path="${path}"]`);
+        if (activeEl) activeEl.classList.add('active');
       }
 
       // ------------------------------------------------------------
-      //  PESTAÑAS
+      // 8. PESTAÑAS
       // ------------------------------------------------------------
       function renderTabs() {
-        if (!tabsContainer) return;
-        if (state.openFiles.length === 0) {
+        if (openFiles.length === 0) {
           tabsContainer.innerHTML = '';
           return;
         }
 
         let html = '';
-        state.openFiles.forEach(file => {
-          const activeClass = (state.activeFileId === file.id) ? 'active' : '';
+        openFiles.forEach(file => {
+          const activeClass = (activeFileId === file.id) ? 'active' : '';
           const dirtyClass = file.dirty ? 'dirty' : '';
           html += `<div class="tab ${activeClass} ${dirtyClass}" data-file-id="${file.id}">
             <span class="tab-label">${file.name}</span>
@@ -629,6 +626,7 @@
         });
         tabsContainer.innerHTML = html;
 
+        // Eventos
         tabsContainer.querySelectorAll('.tab').forEach(tab => {
           tab.addEventListener('click', (e) => {
             if (e.target.closest('.tab-close')) return;
@@ -649,7 +647,7 @@
       }
 
       function closeTab(fileId) {
-        const file = state.openFiles.find(f => f.id === fileId);
+        const file = openFiles.find(f => f.id === fileId);
         if (!file) return;
 
         if (file.dirty) {
@@ -657,28 +655,29 @@
         }
 
         file.model.dispose();
-        state.removeOpenFile(fileId);
+        const index = openFiles.indexOf(file);
+        if (index !== -1) openFiles.splice(index, 1);
 
-        if (state.activeFileId === fileId) {
-          if (state.openFiles.length > 0) {
-            setActiveFile(state.openFiles[0].id);
+        if (activeFileId === fileId) {
+          if (openFiles.length > 0) {
+            setActiveFile(openFiles[0].id);
           } else {
-            state.activeFileId = null;
-            editorInstance.setModel(monaco.editor.createModel('Selecciona un archivo para editar', 'plaintext'));
+            activeFileId = null;
+            editor.setModel(monaco.editor.createModel('Selecciona un archivo para editar', 'plaintext'));
           }
         }
         renderTabs();
       }
 
       // ------------------------------------------------------------
-      //  GUARDAR (descarga universal)
+      // 9. GUARDAR (DESCARGA UNIVERSAL)
       // ------------------------------------------------------------
       function saveActiveFile() {
-        if (!state.activeFileId) {
-          showToast('✗ No hay archivo activo');
+        if (!activeFileId) {
+          showToastMessage('✗ No hay archivo activo');
           return;
         }
-        const file = state.openFiles.find(f => f.id === state.activeFileId);
+        const file = openFiles.find(f => f.id === activeFileId);
         if (!file) return;
 
         const content = file.model.getValue();
@@ -693,88 +692,26 @@
         // Actualizar estado
         file.originalContent = content;
         file.dirty = false;
-        state.updateFileDirty(file.id, false);
         renderTabs();
-        showToast(`⬇️ ${file.name} descargado (reemplaza manualmente si deseas)`);
+        showToastMessage(`⬇️ ${file.name} descargado`);
       }
 
       // ------------------------------------------------------------
-      //  BÚSQUEDA (filtro en tiempo real)
+      // 10. EVENTOS Y ATALOS
       // ------------------------------------------------------------
-      let searchTimeout;
-      searchInput.addEventListener('input', (e) => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-          state.searchQuery = e.target.value.toLowerCase();
-          filterTree();
-        }, 150);
-      });
+      splashOpenBtn.addEventListener('click', openFolder);
+      openFolderBtn.addEventListener('click', openFolder);
+      saveBtn.addEventListener('click', saveActiveFile);
 
-      function filterTree() {
-        const items = sidebarEl.querySelectorAll('.tree-item');
-        items.forEach(item => {
-          const name = item.querySelector('.file-name')?.textContent || '';
-          const path = item.dataset.path || '';
-          const matches = name.toLowerCase().includes(state.searchQuery) || path.toLowerCase().includes(state.searchQuery);
-          item.style.display = matches ? 'flex' : 'none';
-          // Mostrar ancestros si algún hijo es visible
-          if (matches) {
-            let parent = item.closest('ul')?.parentElement;
-            while (parent) {
-              if (parent.classList?.contains('tree-item')) {
-                parent.style.display = 'flex';
-              }
-              parent = parent.parentElement?.closest('li');
-            }
-          }
-        });
-      }
-
-      // ------------------------------------------------------------
-      //  ATALOS DE TECLADO
-      // ------------------------------------------------------------
       document.addEventListener('keydown', (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
-          e.preventDefault();
-          searchInput.focus();
-          searchInput.select();
-        }
         if ((e.ctrlKey || e.metaKey) && e.key === 's') {
           e.preventDefault();
           saveActiveFile();
         }
       });
 
-      // ------------------------------------------------------------
-      //  EVENT LISTENERS
-      // ------------------------------------------------------------
-      splashOpenBtn.addEventListener('click', openFolder);
-      openFolderBtn.addEventListener('click', openFolder);
-      saveBtn.addEventListener('click', saveActiveFile);
-
-      // ------------------------------------------------------------
-      //  RESTAURACIÓN DESDE INDEXEDDB (si hay datos)
-      // ------------------------------------------------------------
-      async function restoreWorkspace() {
-        if (state.files.length > 0) {
-          // Ya hay datos restaurados de la DB, pero necesitamos que el usuario
-          // seleccione la carpeta otra vez para obtener los File handles.
-          // Mostramos un mensaje para que re-seleccione la carpeta.
-          showToast('Reabre la carpeta para restaurar el workspace', 3000);
-        }
-      }
-
-      // Inicializar Lucide
+      // Inicializar iconos
       lucide.createIcons();
-
-      // Si hay workspace guardado, mostramos app y sugerimos reabrir
-      if (state.files.length > 0) {
-        splash.classList.add('hidden');
-        appEl.classList.remove('hidden');
-        // Renderizar árbol con los metadatos guardados (sin handles)
-        await renderSidebar();
-        showToast('Abre la carpeta nuevamente para restaurar la edición', 4000);
-      }
     })();
   </script>
 </body>

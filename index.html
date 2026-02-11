@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-  <title>NEXEDIT · Árbol profesional</title>
+  <title>NEXEDIT · Editor Profesional</title>
   <!-- Monaco Editor -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/min/vs/editor/editor.main.css" />
   <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/min/vs/loader.js"></script>
@@ -27,7 +27,7 @@
     .splash {
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
-      background: #1e1e1e;
+      background: linear-gradient(135deg, #1e1e1e 0%, #252526 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -36,11 +36,19 @@
     .splash-content {
       text-align: center;
       padding: 32px;
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .splash-content h1 {
-      font-size: 48px;
-      font-weight: 500;
-      color: white;
+      font-size: 56px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #007acc 0%, #00b4d8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       margin-bottom: 12px;
       letter-spacing: -0.02em;
     }
@@ -50,20 +58,38 @@
       font-size: 16px;
     }
     .btn-primary {
-      background: #007acc;
+      background: linear-gradient(135deg, #007acc 0%, #005fa3 100%);
       color: white;
       border: none;
-      padding: 12px 32px;
-      border-radius: 6px;
+      padding: 14px 36px;
+      border-radius: 8px;
       font-size: 16px;
+      font-weight: 500;
       display: inline-flex;
       align-items: center;
       gap: 10px;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: all 0.2s;
+      box-shadow: 0 4px 15px rgba(0,122,204,0.3);
     }
     .btn-primary:hover {
-      background: #005fa3;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,122,204,0.4);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: #d4d4d4;
+      border: 1px solid #555;
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 12px;
+    }
+    .btn-secondary:hover {
+      background: #3e3e3e;
+      border-color: #777;
     }
     /* ----- APLICACIÓN PRINCIPAL ----- */
     .app {
@@ -98,6 +124,43 @@
     }
     .app-name {
       font-size: 15px;
+      color: white;
+    }
+    .mode-badge {
+      font-size: 11px;
+      color: #8a8a8a;
+      margin-left: 8px;
+      padding: 2px 8px;
+      background: #3a3a3a;
+      border-radius: 12px;
+      border: 1px solid #444;
+    }
+    .topbar-center {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+      justify-content: center;
+      max-width: 400px;
+      margin: 0 16px;
+    }
+    .search-box {
+      background: #3c3c3c;
+      border: 1px solid #555;
+      border-radius: 4px;
+      padding: 6px 12px;
+      color: #ccc;
+      font-size: 13px;
+      width: 100%;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .search-box:focus {
+      border-color: #007acc;
+      background: #3e3e3e;
+    }
+    .search-box::placeholder {
+      color: #888;
     }
     .topbar-right {
       display: flex;
@@ -114,10 +177,13 @@
       border-radius: 4px;
       font-size: 13px;
       cursor: pointer;
-      transition: background 0.1s;
+      transition: all 0.15s;
     }
     .btn:hover {
       background: #3e3e3e;
+    }
+    .btn.dirty {
+      color: #ff9800;
     }
     .btn i {
       width: 16px;
@@ -129,16 +195,59 @@
       grid-template-columns: 280px 1fr;
       overflow: hidden;
     }
-    @media (max-width: 640px) {
+    @media (max-width: 768px) {
       .workspace { grid-template-columns: 1fr; }
       .sidebar { display: none; }
     }
-    /* ----- SIDEBAR (ÁRBOL DE ARCHIVOS) ----- */
+    /* ----- SIDEBAR ----- */
     .sidebar {
       background: #252526;
       border-right: 1px solid #333;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      overflow: hidden;
+    }
+    .sidebar-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sidebar-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .sidebar-actions {
+      display: flex;
+      gap: 4px;
+    }
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    .icon-btn:hover {
+      background: #3e3e3e;
+      color: #fff;
+    }
+    .icon-btn i {
+      width: 14px;
+      height: 14px;
+    }
+    .sidebar-content {
       overflow-y: auto;
-      padding: 16px 0;
+      padding: 8px 0;
       font-size: 13px;
     }
     .tree, .tree ul {
@@ -146,59 +255,153 @@
       padding-left: 0;
     }
     .tree ul {
-      padding-left: 20px;
+      padding-left: 16px;
+      border-left: 1px solid #333;
+      margin-left: 8px;
     }
     .tree-item {
       display: flex;
       align-items: center;
       gap: 6px;
       padding: 0 8px 0 4px;
-      min-height: 28px;
+      min-height: 26px;
       border-radius: 4px;
       cursor: pointer;
       color: #ccc;
-      transition: background 0.1s;
+      transition: all 0.1s;
       white-space: nowrap;
+      margin: 1px 4px;
     }
     .tree-item:hover {
       background: #2a2d2e;
     }
     .tree-item.active {
-      background: #2a3f4f;
+      background: #094771;
       color: white;
+    }
+    .tree-item.drag-over {
+      background: #1e3a5f;
+      border: 1px dashed #007acc;
     }
     .tree-item i {
       width: 16px;
       height: 16px;
       flex-shrink: 0;
+      color: #858585;
+    }
+    .tree-item.active i {
+      color: white;
     }
     .expand-icon {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 20px;
-      height: 20px;
-      color: #b0b0b0;
+      width: 18px;
+      height: 18px;
+      color: #858585;
       cursor: pointer;
+      border-radius: 3px;
+      transition: transform 0.2s;
+    }
+    .expand-icon:hover {
+      background: #3e3e3e;
+    }
+    .expand-icon.expanded {
+      transform: rotate(90deg);
     }
     .file-name {
       flex: 1;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    /* ----- EDITOR ----- */
+    .tree-item .file-icon {
+      color: #dcb67a;
+    }
+    .tree-item .folder-icon {
+      color: #dcb67a;
+    }
+    .sidebar-footer {
+      padding: 8px 16px;
+      border-top: 1px solid #333;
+      font-size: 11px;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+    }
+    /* ----- EDITOR AREA ----- */
     .editor-area {
       display: grid;
-      grid-template-rows: 1fr;
+      grid-template-rows: 36px 1fr;
       background: #1e1e1e;
       overflow: hidden;
+    }
+    /* TABS */
+    .tabs {
+      display: flex;
+      background: #252526;
+      border-bottom: 1px solid #333;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar {
+      display: none;
+    }
+    .tab {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+      background: #2d2d2d;
+      border-right: 1px solid #252526;
+      color: #969696;
+      font-size: 12px;
+      height: 36px;
+      cursor: pointer;
+      white-space: nowrap;
+      min-width: 120px;
+      max-width: 200px;
+      transition: all 0.15s;
+      position: relative;
+    }
+    .tab:hover {
+      background: #2a2d2e;
+    }
+    .tab.active {
+      background: #1e1e1e;
+      color: #fff;
+      border-top: 2px solid #007acc;
+    }
+    .tab.dirty .tab-label::after {
+      content: " ●";
+      color: #ff9800;
+      font-size: 10px;
+    }
+    .tab-close {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 3px;
+      opacity: 0;
+      transition: all 0.15s;
+    }
+    .tab:hover .tab-close {
+      opacity: 1;
+    }
+    .tab-close:hover {
+      background: #4a4a4a;
+    }
+    .tab-close i {
+      width: 12px;
+      height: 12px;
     }
     #editor-container {
       width: 100%;
       height: 100%;
       background: #1e1e1e;
     }
-    /* ----- TOAST (NOTIFICACIÓN) ----- */
+    /* ----- TOAST ----- */
     .toast {
       position: fixed;
       bottom: 24px;
@@ -209,17 +412,140 @@
       border-radius: 4px;
       font-size: 14px;
       color: #e0e0e0;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
       z-index: 3000;
+      animation: slideIn 0.3s ease;
     }
-    /* ----- INDICADOR DE MODO ----- */
-    .mode-badge {
-      font-size: 11px;
-      color: #8a8a8a;
-      margin-left: 8px;
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .toast.error {
+      border-left-color: #f44336;
+    }
+    .toast.success {
+      border-left-color: #4caf50;
+    }
+    /* ----- BREADCRUMBS ----- */
+    .breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0 12px;
+      height: 24px;
+      background: #1e1e1e;
+      border-bottom: 1px solid #333;
+      font-size: 12px;
+      color: #888;
+      overflow-x: auto;
+    }
+    .breadcrumb-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
       padding: 2px 6px;
-      background: #3a3a3a;
-      border-radius: 4px;
+      border-radius: 3px;
+      transition: all 0.15s;
+    }
+    .breadcrumb-item:hover {
+      background: #3e3e3e;
+      color: #ccc;
+    }
+    .breadcrumb-separator {
+      color: #555;
+    }
+    /* ----- CONTEXT MENU ----- */
+    .context-menu {
+      position: fixed;
+      background: #2d2d2d;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 4px 0;
+      min-width: 160px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      z-index: 4000;
+      display: none;
+    }
+    .context-menu-item {
+      padding: 8px 16px;
+      font-size: 13px;
+      color: #ccc;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+    .context-menu-item:hover {
+      background: #094771;
+      color: white;
+    }
+    .context-menu-item i {
+      width: 14px;
+      height: 14px;
+    }
+    .context-menu-divider {
+      height: 1px;
+      background: #444;
+      margin: 4px 0;
+    }
+    /* ----- STATUS BAR ----- */
+    .status-bar {
+      position: fixed;
+      bottom: 0;
+      left: 280px;
+      right: 0;
+      height: 24px;
+      background: #007acc;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      font-size: 12px;
+      z-index: 100;
+    }
+    @media (max-width: 768px) {
+      .status-bar { left: 0; }
+    }
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    /* ----- EMPTY STATE ----- */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #666;
+      text-align: center;
+      padding: 40px;
+    }
+    .empty-state i {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      color: #444;
+    }
+    .empty-state h3 {
+      font-size: 18px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    .empty-state p {
+      font-size: 14px;
+      max-width: 300px;
+    }
+    .empty-state kbd {
+      background: #3c3c3c;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 12px;
     }
   </style>
 </head>
@@ -228,9 +554,13 @@
   <div id="splash-screen" class="splash">
     <div class="splash-content">
       <h1>NEXEDIT</h1>
-      <p class="subtitle">Árbol de carpetas corregido</p>
+      <p class="subtitle">Editor de código profesional con soporte nativo de archivos</p>
       <button id="splash-open-folder" class="btn-primary">
         <i data-lucide="folder-open"></i> Abrir carpeta
+      </button>
+      <br>
+      <button id="recent-folders-btn" class="btn-secondary hidden">
+        <i data-lucide="history"></i> Carpetas recientes
       </button>
       <p id="mode-hint" style="margin-top: 24px; font-size: 13px; color: #8a8a8a;"></p>
     </div>
@@ -244,36 +574,86 @@
         <span class="app-name">NEXEDIT</span>
         <span id="mode-badge" class="mode-badge"></span>
       </div>
+      <div class="topbar-center">
+        <input type="text" id="global-search" class="search-box" placeholder="Buscar archivos... (Ctrl+P)">
+      </div>
       <div class="topbar-right">
         <button id="save-btn" class="btn" title="Guardar (Ctrl+S)">
-          <i data-lucide="save"></i> Guardar
+          <i data-lucide="save"></i>
         </button>
-        <button id="open-folder-btn" class="btn">
-          <i data-lucide="folder-open"></i> Abrir
+        <button id="close-file-btn" class="btn" title="Cerrar archivo (Ctrl+W)">
+          <i data-lucide="x"></i>
+        </button>
+        <button id="open-folder-btn" class="btn" title="Abrir otra carpeta">
+          <i data-lucide="folder-open"></i>
         </button>
       </div>
     </header>
 
     <div class="workspace">
       <aside class="sidebar" id="sidebar">
-        <!-- Árbol generado dinámicamente -->
+        <div class="sidebar-header">
+          <span class="sidebar-title">EXPLORADOR</span>
+          <div class="sidebar-actions">
+            <button class="icon-btn" id="collapse-all-btn" title="Colapsar todo">
+              <i data-lucide="collapse"></i>
+            </button>
+            <button class="icon-btn" id="refresh-btn" title="Refrescar">
+              <i data-lucide="refresh-cw"></i>
+            </button>
+          </div>
+        </div>
+        <div class="sidebar-content" id="sidebar-content">
+          <!-- Árbol generado dinámicamente -->
+        </div>
+        <div class="sidebar-footer">
+          <span id="file-count">0 archivos</span>
+          <span id="unsaved-indicator"></span>
+        </div>
       </aside>
+      
       <main class="editor-area">
-        <div id="editor-container"></div>
+        <div class="tabs" id="tabs-container"></div>
+        <div class="breadcrumbs hidden" id="breadcrumbs"></div>
+        <div id="editor-container">
+          <div class="empty-state">
+            <i data-lucide="file-code"></i>
+            <h3>No hay archivos abiertos</h3>
+            <p>Haz clic en un archivo del explorador o usa <kbd>Ctrl+O</kbd> para abrir una carpeta</p>
+          </div>
+        </div>
       </main>
     </div>
   </div>
 
-  <!-- INPUT OCULTO PARA FALLBACK (webkitdirectory) -->
+  <!-- INPUTS OCULTOS -->
   <input type="file" id="folder-picker" webkitdirectory style="display: none;" />
+  <input type="file" id="file-picker" style="display: none;" />
 
-  <!-- TOAST NOTIFICACIÓN -->
-  <div id="save-toast" class="toast hidden">✓ Archivo guardado</div>
+  <!-- CONTEXT MENU -->
+  <div id="context-menu" class="context-menu">
+    <div class="context-menu-item" id="ctx-rename">
+      <i data-lucide="edit-2"></i> Renombrar
+    </div>
+    <div class="context-menu-item" id="ctx-delete">
+      <i data-lucide="trash-2"></i> Eliminar
+    </div>
+    <div class="context-menu-divider"></div>
+    <div class="context-menu-item" id="ctx-new-file">
+      <i data-lucide="file-plus"></i> Nuevo archivo
+    </div>
+    <div class="context-menu-item" id="ctx-new-folder">
+      <i data-lucide="folder-plus"></i> Nueva carpeta
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast hidden"></div>
 
   <script>
     (async function() {
       // ------------------------------------------------------------
-      // 1. INICIALIZAR MONACO (AMD)
+      // 1. INICIALIZAR MONACO
       // ------------------------------------------------------------
       await new Promise((resolve) => {
         require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/min/vs' } });
@@ -285,90 +665,169 @@
       // ------------------------------------------------------------
       const splash = document.getElementById('splash-screen');
       const appEl = document.getElementById('app');
-      const sidebarEl = document.getElementById('sidebar');
+      const sidebarContent = document.getElementById('sidebar-content');
+      const tabsContainer = document.getElementById('tabs-container');
       const editorContainer = document.getElementById('editor-container');
+      const breadcrumbs = document.getElementById('breadcrumbs');
+      const folderPicker = document.getElementById('folder-picker');
+      const filePicker = document.getElementById('file-picker');
       const saveBtn = document.getElementById('save-btn');
+      const closeFileBtn = document.getElementById('close-file-btn');
       const openFolderBtn = document.getElementById('open-folder-btn');
       const splashOpenBtn = document.getElementById('splash-open-folder');
-      const toast = document.getElementById('save-toast');
+      const recentFoldersBtn = document.getElementById('recent-folders-btn');
+      const collapseAllBtn = document.getElementById('collapse-all-btn');
+      const refreshBtn = document.getElementById('refresh-btn');
+      const globalSearch = document.getElementById('global-search');
       const modeBadge = document.getElementById('mode-badge');
       const modeHint = document.getElementById('mode-hint');
-      const folderPicker = document.getElementById('folder-picker');
+      const toast = document.getElementById('toast');
+      const fileCount = document.getElementById('file-count');
+      const unsavedIndicator = document.getElementById('unsaved-indicator');
+      const contextMenu = document.getElementById('context-menu');
 
       // ------------------------------------------------------------
-      // 3. ESTADO GLOBAL UNIFICADO
+      // 3. ESTADO GLOBAL
       // ------------------------------------------------------------
-      let mode = null;                     // 'fsa' o 'fallback'
-      let files = [];                    // Todos los archivos: { path, name, handle (FSA) | fileObject (fallback), content, language }
-      let openFiles = [];               // Archivos abiertos (referencias de files)
+      const MAX_OPEN_FILES = 10;
+      let mode = null;
+      let files = [];
+      let openFiles = [];
       let activeFileId = null;
-      let expandedFolders = new Set(['']); // Rutas expandidas
-
+      let expandedFolders = new Set(['']);
       let editor = null;
-      let directoryHandle = null;       // Solo FSA
+      let directoryHandle = null;
+      let needsReRender = false;
+      let recentFolders = JSON.parse(localStorage.getItem('nexedit-recent') || '[]');
 
       // ------------------------------------------------------------
-      // 4. FUNCIONES AUXILIARES COMUNES
+      // 4. UTILIDADES
       // ------------------------------------------------------------
-      function showToastMessage(msg, duration = 2000) {
+      function showToast(msg, type = 'info', duration = 3000) {
         toast.textContent = msg;
+        toast.className = `toast ${type}`;
         toast.classList.remove('hidden');
         setTimeout(() => toast.classList.add('hidden'), duration);
+      }
+
+      function updateFileCount() {
+        fileCount.textContent = `${files.length} archivos`;
+        const unsaved = openFiles.filter(f => f.dirty).length;
+        unsavedIndicator.textContent = unsaved > 0 ? `${unsaved} sin guardar` : '';
+        unsavedIndicator.style.color = unsaved > 0 ? '#ff9800' : '#666';
+      }
+
+      function updateTitle() {
+        const active = openFiles.find(f => f.id === activeFileId);
+        if (active) {
+          const dirtyMarker = active.dirty ? '● ' : '';
+          document.title = `${dirtyMarker}${active.name} · NEXEDIT`;
+          saveBtn.classList.toggle('dirty', active.dirty);
+        } else {
+          document.title = 'NEXEDIT · Editor Profesional';
+          saveBtn.classList.remove('dirty');
+        }
+        updateFileCount();
       }
 
       function detectLanguage(filename) {
         const ext = filename.split('.').pop().toLowerCase();
         const map = {
-          js: 'javascript', ts: 'typescript', jsx: 'javascript', tsx: 'typescript',
-          html: 'html', css: 'css', scss: 'scss', less: 'less',
-          json: 'json', md: 'markdown', xml: 'xml', yml: 'yaml', yaml: 'yaml',
-          py: 'python', rb: 'ruby', go: 'go', rs: 'rust', java: 'java',
-          c: 'c', cpp: 'cpp', h: 'cpp', hpp: 'cpp', cs: 'csharp',
-          php: 'php', sql: 'sql', sh: 'shell', bash: 'shell',
-          swift: 'swift', kt: 'kotlin', dockerfile: 'dockerfile'
+          js: 'javascript', mjs: 'javascript', cjs: 'javascript',
+          ts: 'typescript', jsx: 'javascript', tsx: 'typescript',
+          html: 'html', htm: 'html', xhtml: 'html',
+          css: 'css', scss: 'scss', sass: 'scss', less: 'less',
+          json: 'json', jsonc: 'json',
+          md: 'markdown', mdx: 'markdown',
+          xml: 'xml', svg: 'xml',
+          yml: 'yaml', yaml: 'yaml',
+          py: 'python', pyc: 'python', pyo: 'python',
+          rb: 'ruby', erb: 'ruby',
+          go: 'go', mod: 'go', sum: 'go',
+          rs: 'rust', java: 'java', class: 'java', jar: 'java',
+          c: 'c', cpp: 'cpp', cc: 'cpp', cxx: 'cpp', h: 'cpp', hpp: 'cpp',
+          cs: 'csharp', csx: 'csharp',
+          php: 'php', phtml: 'php',
+          swift: 'swift', kt: 'kotlin', kts: 'kotlin',
+          sql: 'sql', sqlite: 'sql',
+          sh: 'shell', bash: 'shell', zsh: 'shell', fish: 'shell',
+          ps1: 'powershell', psd1: 'powershell', psm1: 'powershell',
+          dockerfile: 'dockerfile', makefile: 'makefile', gnumakefile: 'makefile',
+          env: 'ini', ini: 'ini', cfg: 'ini', conf: 'ini',
+          log: 'log', txt: 'plaintext'
         };
         return map[ext] || 'plaintext';
       }
 
+      function getFileIcon(filename, isOpen = false) {
+        const ext = filename.split('.').pop().toLowerCase();
+        const iconMap = {
+          js: 'file-json', ts: 'file-typescript', jsx: 'file-json', tsx: 'file-typescript',
+          html: 'file-html', css: 'file-code', scss: 'file-code', json: 'file-json',
+          md: 'file-text', py: 'file-code', java: 'file-code', go: 'file-code',
+          rs: 'file-code', cpp: 'file-code', c: 'file-code', cs: 'file-code',
+          php: 'file-code', rb: 'file-code', swift: 'file-code', kt: 'file-code',
+          yml: 'file-code', yaml: 'file-code', xml: 'file-code', svg: 'file-image',
+          png: 'file-image', jpg: 'file-image', jpeg: 'file-image', gif: 'file-image',
+          mp4: 'file-video', mp3: 'file-audio', pdf: 'file-text', zip: 'file-archive'
+        };
+        return iconMap[ext] || (isOpen ? 'folder-open' : 'folder');
+      }
+
       // ------------------------------------------------------------
-      // 5. CONSTRUCCIÓN DEL ÁRBOL (CORREGIDA, CON RECURSIÓN INFINITA)
+      // 5. ÁRBOL DE ARCHIVOS (CORREGIDO)
       // ------------------------------------------------------------
       function renderTree() {
         const rootUl = document.createElement('ul');
         rootUl.className = 'tree';
         buildTree(rootUl, '');
-        sidebarEl.innerHTML = '';
-        sidebarEl.appendChild(rootUl);
-        // Restaurar resaltado si hay archivo activo
+        sidebarContent.innerHTML = '';
+        sidebarContent.appendChild(rootUl);
+        
         if (activeFileId) {
           const active = openFiles.find(f => f.id === activeFileId);
-          if (active) highlightActiveFileInSidebar(active.path);
+          if (active) {
+            ensurePathExpanded(active.path);
+            if (needsReRender) {
+              needsReRender = false;
+              renderTree();
+              return;
+            }
+            setTimeout(() => highlightActiveFileInSidebar(active.path), 0);
+          }
         }
-        lucide.createIcons(); // ¡IMPORTANTE! Actualiza iconos después de renderizar
+        lucide.createIcons();
+      }
+
+      function ensurePathExpanded(filePath) {
+        const parts = filePath.split('/');
+        let currentPath = '';
+        for (let i = 0; i < parts.length - 1; i++) {
+          currentPath = currentPath ? `${currentPath}/${parts[i]}` : parts[i];
+          if (!expandedFolders.has(currentPath)) {
+            expandedFolders.add(currentPath);
+            needsReRender = true;
+          }
+        }
       }
 
       function buildTree(parentUl, basePath) {
-        const items = new Map(); // nombre del item en este nivel -> { name, fullPath, isDir }
-
-        // Normalizar basePath (sin / al final excepto raíz)
+        const items = new Map();
         const normalizedBase = basePath === '' ? '' : basePath;
 
         files.forEach(file => {
           const parts = file.path.split('/');
-
-          // Determinar el índice donde empieza el nivel actual
           let baseIndex = -1;
+          
           if (normalizedBase === '') {
-            baseIndex = 0; // raíz
+            baseIndex = 0;
           } else {
-            // Verificar si este archivo está dentro de basePath
             if (!file.path.startsWith(normalizedBase + '/') && file.path !== normalizedBase) {
-              return; // no pertenece a esta rama
+              return;
             }
             baseIndex = normalizedBase.split('/').length;
           }
 
-          // Si el archivo está exactamente en basePath (sin más partes), lo ignoramos (no es directorio)
           if (baseIndex >= parts.length) return;
 
           const itemName = parts[baseIndex];
@@ -379,12 +838,12 @@
             items.set(itemName, {
               name: itemName,
               fullPath: itemFullPath,
-              isDir: isDirectory
+              isDir: isDirectory,
+              fileData: isDirectory ? null : file
             });
           }
         });
 
-        // Ordenar: carpetas primero, luego archivos, alfabético
         const sorted = Array.from(items.values()).sort((a, b) => {
           if (a.isDir && !b.isDir) return -1;
           if (!a.isDir && b.isDir) return 1;
@@ -397,51 +856,60 @@
           div.className = 'tree-item';
           div.dataset.path = item.fullPath;
           div.dataset.kind = item.isDir ? 'directory' : 'file';
+          div.draggable = !item.isDir;
 
-          // Expand/colapsar
           if (item.isDir) {
             const expandSpan = document.createElement('span');
             expandSpan.className = 'expand-icon';
             const isExpanded = expandedFolders.has(item.fullPath);
-            expandSpan.innerHTML = `<i data-lucide="${isExpanded ? 'chevron-down' : 'chevron-right'}"></i>`;
+            if (isExpanded) expandSpan.classList.add('expanded');
+            expandSpan.innerHTML = `<i data-lucide="chevron-right"></i>`;
             
-            // Evento específico para el icono de expandir
             expandSpan.addEventListener('click', (e) => {
               e.stopPropagation();
               e.preventDefault();
-              if (expandedFolders.has(item.fullPath)) {
-                expandedFolders.delete(item.fullPath);
-              } else {
-                expandedFolders.add(item.fullPath);
-              }
-              renderTree();
+              toggleFolder(item.fullPath);
             });
             div.appendChild(expandSpan);
           } else {
             const spacer = document.createElement('span');
-            spacer.style.width = '20px';
+            spacer.style.width = '18px';
             spacer.style.display = 'inline-block';
             div.appendChild(spacer);
           }
 
-          // Icono de carpeta/archivo
           const icon = document.createElement('i');
           if (item.isDir) {
             icon.dataset.lucide = expandedFolders.has(item.fullPath) ? 'folder-open' : 'folder';
+            icon.className = 'folder-icon';
           } else {
-            icon.dataset.lucide = 'file';
+            icon.dataset.lucide = getFileIcon(item.name);
+            icon.className = 'file-icon';
           }
           div.appendChild(icon);
 
-          // Nombre
           const nameSpan = document.createElement('span');
           nameSpan.className = 'file-name';
           nameSpan.textContent = item.name;
+          nameSpan.title = item.fullPath;
           div.appendChild(nameSpan);
+
+          // Eventos de drag para archivos
+          if (!item.isDir) {
+            div.addEventListener('dragstart', (e) => {
+              e.dataTransfer.setData('text/plain', item.fullPath);
+              e.dataTransfer.effectAllowed = 'move';
+            });
+          }
+
+          // Context menu
+          div.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            showContextMenu(e, item);
+          });
 
           li.appendChild(div);
 
-          // Hijos (solo si es carpeta expandida)
           if (item.isDir && expandedFolders.has(item.fullPath)) {
             const childUl = document.createElement('ul');
             buildTree(childUl, item.fullPath);
@@ -452,13 +920,43 @@
         });
       }
 
-      // ------------------------------------------------------------
-      // 6. DELEGACIÓN DE EVENTOS PARA EL ÁRBOL (ROBUSTA)
-      // ------------------------------------------------------------
-      sidebarEl.addEventListener('click', async (e) => {
-        // Ignorar clicks en el expand-icon (ya tienen su propio handler)
-        if (e.target.closest('.expand-icon')) return;
+      function toggleFolder(path) {
+        if (expandedFolders.has(path)) {
+          expandedFolders.delete(path);
+        } else {
+          expandedFolders.add(path);
+        }
+        renderTree();
+      }
 
+      function highlightActiveFileInSidebar(path) {
+        document.querySelectorAll('.tree-item.active').forEach(el => {
+          el.classList.remove('active');
+          const icon = el.querySelector('.folder-icon');
+          if (icon) {
+            const isExpanded = expandedFolders.has(el.dataset.path);
+            icon.dataset.lucide = isExpanded ? 'folder-open' : 'folder';
+          }
+        });
+        
+        const activeEl = document.querySelector(`.tree-item[data-path="${path}"]`);
+        if (activeEl) {
+          activeEl.classList.add('active');
+          const icon = activeEl.querySelector('.file-icon');
+          if (icon) icon.dataset.lucide = 'file-edit';
+          
+          // Scroll into view
+          activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        lucide.createIcons();
+      }
+
+      // ------------------------------------------------------------
+      // 6. EVENTOS DEL ÁRBOL
+      // ------------------------------------------------------------
+      sidebarContent.addEventListener('click', async (e) => {
+        if (e.target.closest('.expand-icon')) return;
+        
         const treeItem = e.target.closest('.tree-item');
         if (!treeItem) return;
 
@@ -470,28 +968,24 @@
           e.stopPropagation();
           await openFileByPath(path);
         } else if (kind === 'directory') {
-          // Click en carpeta (fuera del icono) también expande/colapsa
           e.preventDefault();
           e.stopPropagation();
-          if (expandedFolders.has(path)) {
-            expandedFolders.delete(path);
-          } else {
-            expandedFolders.add(path);
-          }
-          renderTree();
+          toggleFolder(path);
         }
       });
 
       // ------------------------------------------------------------
-      // 7. APERTURA DE CARPETA (MODO FSA)
+      // 7. APERTURA DE CARPETAS (FSA + FALLBACK)
       // ------------------------------------------------------------
       async function* walkDirectory(dirHandle, basePath = '') {
         for await (const entry of dirHandle.values()) {
           if (entry.kind === 'file') {
             const path = basePath + entry.name;
-            yield { path, handle: entry };
+            yield { path, handle: entry, kind: 'file' };
           } else if (entry.kind === 'directory') {
-            yield* walkDirectory(entry, basePath + entry.name + '/');
+            const dirPath = basePath + entry.name + '/';
+            yield { path: dirPath.slice(0, -1), handle: entry, kind: 'directory' };
+            yield* walkDirectory(entry, dirPath);
           }
         }
       }
@@ -500,53 +994,67 @@
         try {
           const dirHandle = await window.showDirectoryPicker();
           directoryHandle = dirHandle;
-
-          // Resetear estado
-          files = [];
-          openFiles.forEach(f => f.model?.dispose());
-          openFiles = [];
-          activeFileId = null;
-          expandedFolders = new Set(['']);
-
-          for await (const { path, handle } of walkDirectory(dirHandle)) {
-            const fileName = path.split('/').pop() || path;
-            files.push({
-              path,
-              name: fileName,
-              handle,                    // FileSystemFileHandle
-              content: null,            // bajo demanda
-              language: detectLanguage(fileName)
-            });
-          }
-
-          files.sort((a, b) => a.path.localeCompare(b.path));
-          renderTree();
+          
+          // Guardar en recientes
+          addRecentFolder(dirHandle.name);
+          
+          await loadFilesFromHandle(dirHandle);
           return true;
         } catch (err) {
           if (err.name === 'AbortError') return false;
           console.error(err);
-          showToastMessage('✗ Error al abrir carpeta con FSA', 3000);
+          showToast('Error al abrir carpeta', 'error');
           return false;
         }
       }
 
-      // ------------------------------------------------------------
-      // 8. APERTURA DE CARPETA (MODO FALLBACK)
-      // ------------------------------------------------------------
+      async function loadFilesFromHandle(dirHandle) {
+        files = [];
+        openFiles.forEach(f => f.model?.dispose());
+        openFiles = [];
+        activeFileId = null;
+        expandedFolders = new Set(['']);
+
+        for await (const { path, handle, kind } of walkDirectory(dirHandle)) {
+          if (kind === 'file') {
+            const fileName = path.split('/').pop();
+            files.push({
+              path,
+              name: fileName,
+              handle,
+              content: null,
+              language: detectLanguage(fileName)
+            });
+          }
+        }
+
+        files.sort((a, b) => a.path.localeCompare(b.path));
+        renderTree();
+        showToast(`Carpeta cargada: ${files.length} archivos`, 'success');
+      }
+
       function openFolderFallback() {
         folderPicker.click();
       }
 
       folderPicker.addEventListener('change', (e) => {
         const fileList = e.target.files;
-        if (!fileList || fileList.length === 0) return;
+        if (!fileList || fileList.length === 0) {
+          if (files.length === 0) {
+            splash.classList.remove('hidden');
+            appEl.classList.add('hidden');
+          }
+          return;
+        }
 
-        // Resetear estado
         files = [];
         openFiles.forEach(f => f.model?.dispose());
         openFiles = [];
         activeFileId = null;
         expandedFolders = new Set(['']);
+
+        const rootFolderName = fileList[0].webkitRelativePath.split('/')[0];
+        addRecentFolder(rootFolderName);
 
         for (let i = 0; i < fileList.length; i++) {
           const file = fileList[i];
@@ -554,32 +1062,55 @@
           files.push({
             path,
             name: file.name,
-            fileObject: file,           // Objeto File nativo
+            fileObject: file,
             content: null,
             language: detectLanguage(file.name)
           });
         }
 
         files.sort((a, b) => a.path.localeCompare(b.path));
+        
+        splash.classList.add('hidden');
+        appEl.classList.remove('hidden');
         renderTree();
-        showToastMessage(`Carpeta abierta (modo compatible): ${files.length} archivos`);
+        showToast(`Carpeta cargada: ${files.length} archivos`, 'success');
       });
 
+      function addRecentFolder(name) {
+        recentFolders = recentFolders.filter(f => f !== name);
+        recentFolders.unshift(name);
+        if (recentFolders.length > 5) recentFolders.pop();
+        localStorage.setItem('nexedit-recent', JSON.stringify(recentFolders));
+        updateRecentButton();
+      }
+
+      function updateRecentButton() {
+        if (recentFolders.length > 0) {
+          recentFoldersBtn.classList.remove('hidden');
+        }
+      }
+
       // ------------------------------------------------------------
-      // 9. ABRIR ARCHIVO (UNIFICADO, SEGÚN MODO)
+      // 8. GESTIÓN DE ARCHIVOS ABIERTOS
       // ------------------------------------------------------------
       async function openFileByPath(path) {
-        const fileData = files.find(f => f.path === path);
-        if (!fileData) return;
+        if (openFiles.length >= MAX_OPEN_FILES) {
+          showToast('Máximo 10 archivos abiertos', 'error');
+          return;
+        }
 
-        // Verificar si ya está abierto
+        const fileData = files.find(f => f.path === path);
+        if (!fileData) {
+          showToast('Archivo no encontrado', 'error');
+          return;
+        }
+
         const existing = openFiles.find(f => f.path === path);
         if (existing) {
           setActiveFile(existing.id);
           return;
         }
 
-        // Leer contenido si no está en caché
         if (!fileData.content) {
           try {
             if (mode === 'fsa') {
@@ -589,14 +1120,13 @@
               fileData.content = await readFileAsText(fileData.fileObject);
             }
           } catch (err) {
-            showToastMessage('✗ Error al leer el archivo');
+            showToast('Error al leer archivo', 'error');
             return;
           }
         }
 
-        // Crear modelo Monaco
         const model = monaco.editor.createModel(fileData.content, fileData.language);
-        const fileId = 'file-' + Date.now() + '-' + Math.random().toString(36).substring(2);
+        const fileId = 'file-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
 
         const newFile = {
           id: fileId,
@@ -605,7 +1135,7 @@
           model: model,
           dirty: false,
           originalContent: fileData.content,
-          fileData: fileData // referencia al objeto en files
+          fileData: fileData
         };
 
         model.onDidChangeContent(() => {
@@ -613,15 +1143,16 @@
           const dirty = current !== newFile.originalContent;
           if (newFile.dirty !== dirty) {
             newFile.dirty = dirty;
-            // Actualizar el contenido en files también
             fileData.content = current;
+            updateTitle();
             renderTabs();
           }
         });
 
         openFiles.push(newFile);
-        setActiveFile(fileId);
         renderTabs();
+        setActiveFile(fileId);
+        updateBreadcrumbs(path);
       }
 
       function readFileAsText(file) {
@@ -636,97 +1167,281 @@
       function setActiveFile(fileId) {
         const file = openFiles.find(f => f.id === fileId);
         if (!file) return;
+
         activeFileId = fileId;
+        
         if (!editor) {
           editor = monaco.editor.create(editorContainer, {
-            value: file.model.getValue(),
-            language: file.fileData.language,
+            model: file.model,
             theme: 'vs-dark',
             automaticLayout: true,
             fontSize: 14,
-            fontFamily: 'JetBrains Mono, Fira Code, monospace',
-            minimap: { enabled: false }
+            fontFamily: 'JetBrains Mono, Fira Code, Consolas, monospace',
+            minimap: { enabled: true, scale: 1 },
+            scrollBeyondLastLine: false,
+            wordWrap: 'on',
+            lineNumbers: 'on',
+            renderWhitespace: 'selection',
+            bracketPairColorization: { enabled: true },
+            formatOnPaste: true,
+            formatOnType: true,
+            autoIndent: 'full',
+            tabSize: 2,
+            insertSpaces: true
           });
         } else {
           editor.setModel(file.model);
         }
+
         renderTabs();
         highlightActiveFileInSidebar(file.path);
+        updateBreadcrumbs(file.path);
+        updateTitle();
       }
 
-      function highlightActiveFileInSidebar(path) {
-        document.querySelectorAll('.tree-item.active').forEach(el => el.classList.remove('active'));
-        const activeEl = document.querySelector(`.tree-item[data-path="${path}"]`);
-        if (activeEl) activeEl.classList.add('active');
-      }
+      function closeFile(fileId) {
+        const idx = openFiles.findIndex(f => f.id === fileId);
+        if (idx === -1) return;
 
-      // ------------------------------------------------------------
-      // 10. PESTAÑAS (OPCIONAL PERO PROFESIONAL)
-      // ------------------------------------------------------------
-      function renderTabs() {
-        // No implementamos pestañas para mantener simplicidad, pero puedes agregarlas aquí
-        // Por ahora solo actualizamos el título o nada
-      }
-
-      // ------------------------------------------------------------
-      // 11. GUARDAR (SEGÚN MODO)
-      // ------------------------------------------------------------
-      async function saveFile() {
-        if (!activeFileId) {
-          showToastMessage('✗ No hay archivo activo');
+        const file = openFiles[idx];
+        if (file.dirty && !confirm(`Hay cambios sin guardar en ${file.name}. ¿Cerrar igualmente?`)) {
           return;
         }
 
-        const active = openFiles.find(f => f.id === activeFileId);
-        if (!active) return;
+        file.model.dispose();
+        openFiles.splice(idx, 1);
 
-        if (mode === 'fsa') {
-          // Guardado con File System Access API
-          try {
-            const handle = active.fileData.handle;
+        if (activeFileId === fileId) {
+          if (openFiles.length > 0) {
+            setActiveFile(openFiles[Math.min(idx, openFiles.length - 1)].id);
+          } else {
+            activeFileId = null;
+            editor?.dispose();
+            editor = null;
+            editorContainer.innerHTML = `
+              <div class="empty-state">
+                <i data-lucide="file-code"></i>
+                <h3>No hay archivos abiertos</h3>
+                <p>Haz clic en un archivo del explorador o usa <kbd>Ctrl+O</kbd> para abrir una carpeta</p>
+              </div>
+            `;
+            lucide.createIcons();
+            breadcrumbs.classList.add('hidden');
+            tabsContainer.innerHTML = '';
+            updateTitle();
+          }
+        } else {
+          renderTabs();
+        }
+      }
+
+      // ------------------------------------------------------------
+      // 9. PESTAÑAS
+      // ------------------------------------------------------------
+      function renderTabs() {
+        if (openFiles.length === 0) {
+          tabsContainer.innerHTML = '';
+          return;
+        }
+
+        tabsContainer.innerHTML = openFiles.map(file => `
+          <div class="tab ${file.id === activeFileId ? 'active' : ''} ${file.dirty ? 'dirty' : ''}" data-file-id="${file.id}">
+            <i data-lucide="${getFileIcon(file.name)}" style="width: 14px; height: 14px;"></i>
+            <span class="tab-label">${file.name}</span>
+            <span class="tab-close" data-file-id="${file.id}">
+              <i data-lucide="x"></i>
+            </span>
+          </div>
+        `).join('');
+
+        tabsContainer.querySelectorAll('.tab').forEach(tab => {
+          tab.addEventListener('click', (e) => {
+            if (e.target.closest('.tab-close')) return;
+            setActiveFile(tab.dataset.fileId);
+          });
+        });
+
+        tabsContainer.querySelectorAll('.tab-close').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeFile(btn.dataset.fileId);
+          });
+        });
+
+        lucide.createIcons();
+      }
+
+      // ------------------------------------------------------------
+      // 10. BREADCRUMBS
+      // ------------------------------------------------------------
+      function updateBreadcrumbs(path) {
+        if (!path) {
+          breadcrumbs.classList.add('hidden');
+          return;
+        }
+
+        const parts = path.split('/');
+        breadcrumbs.classList.remove('hidden');
+        breadcrumbs.innerHTML = parts.map((part, idx) => {
+          const partialPath = parts.slice(0, idx + 1).join('/');
+          const isLast = idx === parts.length - 1;
+          return `
+            ${idx > 0 ? '<span class="breadcrumb-separator">/</span>' : ''}
+            <span class="breadcrumb-item ${isLast ? 'active' : ''}" data-path="${partialPath}" data-is-file="${isLast}">
+              ${part}
+            </span>
+          `;
+        }).join('');
+
+        breadcrumbs.querySelectorAll('.breadcrumb-item').forEach(item => {
+          item.addEventListener('click', () => {
+            if (item.dataset.isFile === 'false') {
+              toggleFolder(item.dataset.path);
+            }
+          });
+        });
+      }
+
+      // ------------------------------------------------------------
+      // 11. GUARDAR
+      // ------------------------------------------------------------
+      async function saveFile() {
+        if (!activeFileId) {
+          showToast('No hay archivo activo', 'error');
+          return;
+        }
+
+        const file = openFiles.find(f => f.id === activeFileId);
+        if (!file || !file.dirty) return;
+
+        try {
+          if (mode === 'fsa') {
+            const handle = file.fileData.handle;
             if (await handle.queryPermission({ mode: 'readwrite' }) !== 'granted') {
               const perm = await handle.requestPermission({ mode: 'readwrite' });
               if (perm !== 'granted') throw new Error('Permiso denegado');
             }
             const writable = await handle.createWritable();
-            await writable.write(active.model.getValue());
+            await writable.write(file.model.getValue());
             await writable.close();
-
-            active.originalContent = active.model.getValue();
-            active.dirty = false;
-            active.fileData.content = active.model.getValue();
-            showToastMessage(`✓ ${active.name} guardado`);
-          } catch (err) {
-            console.error(err);
-            showToastMessage('✗ Error al guardar');
+          } else {
+            const content = file.model.getValue();
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = file.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
           }
-        } else {
-          // Modo fallback: descarga
-          const content = active.model.getValue();
-          const blob = new Blob([content], { type: 'text/plain' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = active.name;
-          a.click();
-          URL.revokeObjectURL(url);
 
-          active.originalContent = content;
-          active.dirty = false;
-          active.fileData.content = content;
-          showToastMessage(`⬇️ ${active.name} descargado`);
+          file.originalContent = file.model.getValue();
+          file.dirty = false;
+          updateTitle();
+          renderTabs();
+          showToast(`${file.name} guardado`, 'success');
+        } catch (err) {
+          console.error(err);
+          showToast('Error al guardar', 'error');
         }
       }
 
       // ------------------------------------------------------------
-      // 12. MODO DE APERTURA PRINCIPAL (DETECCIÓN)
+      // 12. BÚSQUEDA
+      // ------------------------------------------------------------
+      function filterFiles(query) {
+        if (!query) {
+          renderTree();
+          return;
+        }
+
+        const matches = files.filter(f => 
+          f.name.toLowerCase().includes(query.toLowerCase()) ||
+          f.path.toLowerCase().includes(query.toLowerCase())
+        );
+
+        // Renderizar solo matches con sus paths expandidos
+        expandedFolders = new Set(['']);
+        matches.forEach(f => {
+          const parts = f.path.split('/');
+          let current = '';
+          for (let i = 0; i < parts.length - 1; i++) {
+            current = current ? `${current}/${parts[i]}` : parts[i];
+            expandedFolders.add(current);
+          }
+        });
+
+        renderTree();
+        
+        // Highlight matches
+        setTimeout(() => {
+          document.querySelectorAll('.tree-item').forEach(item => {
+            const path = item.dataset.path;
+            const file = files.find(f => f.path === path);
+            if (file && matches.includes(file)) {
+              item.style.background = '#1e3a5f';
+            }
+          });
+        }, 0);
+      }
+
+      globalSearch.addEventListener('input', (e) => {
+        filterFiles(e.target.value);
+      });
+
+      globalSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          globalSearch.value = '';
+          filterFiles('');
+          globalSearch.blur();
+        }
+      });
+
+      // ------------------------------------------------------------
+      // 13. CONTEXT MENU
+      // ------------------------------------------------------------
+      function showContextMenu(e, item) {
+        contextMenu.style.display = 'block';
+        contextMenu.style.left = e.pageX + 'px';
+        contextMenu.style.top = e.pageY + 'px';
+        
+        // Configurar acciones según el tipo
+        const renameBtn = document.getElementById('ctx-rename');
+        const deleteBtn = document.getElementById('ctx-delete');
+        
+        renameBtn.onclick = () => {
+          const newName = prompt('Nuevo nombre:', item.name);
+          if (newName && newName !== item.name) {
+            showToast('Renombrar no implementado en modo ' + mode, 'info');
+          }
+          hideContextMenu();
+        };
+        
+        deleteBtn.onclick = () => {
+          if (confirm(`¿Eliminar ${item.name}?`)) {
+            showToast('Eliminar no implementado en modo ' + mode, 'info');
+          }
+          hideContextMenu();
+        };
+      }
+
+      function hideContextMenu() {
+        contextMenu.style.display = 'none';
+      }
+
+      document.addEventListener('click', hideContextMenu);
+
+      // ------------------------------------------------------------
+      // 14. BOTONES Y ATAJOS
       // ------------------------------------------------------------
       async function openFolder() {
         const supportsFSA = window.showDirectoryPicker && window.isSecureContext;
+        
         if (supportsFSA) {
           mode = 'fsa';
           modeBadge.textContent = 'FS API';
-          modeHint.textContent = 'Usando File System Access API (guardado directo)';
           const success = await openFolderFSA();
           if (success) {
             splash.classList.add('hidden');
@@ -735,46 +1450,79 @@
         } else {
           mode = 'fallback';
           modeBadge.textContent = 'Compatibilidad';
-          modeHint.textContent = 'Usando modo compatible (descarga para guardar)';
           splash.classList.add('hidden');
           appEl.classList.remove('hidden');
           openFolderFallback();
         }
       }
 
-      // ------------------------------------------------------------
-      // 13. EVENTOS DE USUARIO
-      // ------------------------------------------------------------
+      collapseAllBtn.addEventListener('click', () => {
+        expandedFolders = new Set(['']);
+        renderTree();
+      });
+
+      refreshBtn.addEventListener('click', async () => {
+        if (mode === 'fsa' && directoryHandle) {
+          await loadFilesFromHandle(directoryHandle);
+          showToast('Explorador actualizado', 'success');
+        } else {
+          showToast('Refrescar solo disponible en modo FS API', 'info');
+        }
+      });
+
       splashOpenBtn.addEventListener('click', openFolder);
       openFolderBtn.addEventListener('click', openFolder);
       saveBtn.addEventListener('click', saveFile);
+      closeFileBtn.addEventListener('click', () => {
+        if (activeFileId) closeFile(activeFileId);
+      });
 
+      recentFoldersBtn.addEventListener('click', () => {
+        if (recentFolders.length > 0) {
+          openFolder();
+        }
+      });
+
+      // Atajos de teclado
       document.addEventListener('keydown', (e) => {
+        // Ctrl+S: Guardar
         if ((e.ctrlKey || e.metaKey) && e.key === 's') {
           e.preventDefault();
           saveFile();
         }
+        // Ctrl+W: Cerrar archivo
+        else if ((e.ctrlKey || e.metaKey) && e.key === 'w') {
+          e.preventDefault();
+          if (activeFileId) closeFile(activeFileId);
+        }
+        // Ctrl+O: Abrir carpeta
+        else if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
+          e.preventDefault();
+          openFolder();
+        }
+        // Ctrl+P: Buscar archivo
+        else if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+          e.preventDefault();
+          globalSearch.focus();
+        }
+        // Escape: Limpiar búsqueda
+        else if (e.key === 'Escape' && document.activeElement === globalSearch) {
+          globalSearch.value = '';
+          filterFiles('');
+          globalSearch.blur();
+        }
       });
 
       // ------------------------------------------------------------
-      // 14. INICIALIZAR EDITOR VACÍO Y MOSTRAR HINT
+      // 15. INICIALIZACIÓN
       // ------------------------------------------------------------
-      editor = monaco.editor.create(editorContainer, {
-        value: 'Abre una carpeta para empezar',
-        language: 'plaintext',
-        theme: 'vs-dark',
-        automaticLayout: true,
-        fontSize: 14,
-        fontFamily: 'JetBrains Mono, Fira Code, monospace',
-        minimap: { enabled: false }
-      });
-
       if (window.showDirectoryPicker && window.isSecureContext) {
-        modeHint.textContent = '✓ File System Access API disponible (guardado directo)';
+        modeHint.innerHTML = '✓ <strong>File System Access API</strong> disponible<br>Permite guardar directamente en disco';
       } else {
-        modeHint.textContent = 'ℹ️ Usando modo compatible (descarga para guardar)';
+        modeHint.innerHTML = 'ℹ️ Usando modo compatible<br>Los archivos se descargan al guardar';
       }
 
+      updateRecentButton();
       lucide.createIcons();
     })();
   </script>

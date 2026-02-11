@@ -1,550 +1,773 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Textastic · Web Code Editor</title>
-    <!-- Monaco editor loader from CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.34.1/min/vs/loader.js"></script>
-    <style>
-        /* ---------- RESET & PROFESSIONAL DARK THEME — TEXTISTIC INSPIRED ---------- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'SF Mono', 'Menlo', 'Monaco', 'Cascadia Code', 'Consolas', 'Courier New', monospace;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Textastic · Editor profesional</title>
+  
+  <!-- Monaco Editor assets (CDN) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/min/vs/editor/editor.main.css" />
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/min/vs/loader.js"></script>
+  
+  <!-- Lucide icons (minimal vector icons) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    /* ----- GLOBAL RESET & VARIABLES (Textastic aesthetic) ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
 
-        html, body {
-            height: 100%;
-            width: 100%;
-            background-color: #1e1e1e;
-            overflow: hidden;
-            color: #e0e0e0;
-        }
+    body {
+      background-color: #1e1e1e;
+      height: 100vh;
+      overflow: hidden;
+      color: #d4d4d4;
+    }
 
-        /* ----- MAIN FLEX LAYOUT (CLEAN, AIRY, NO OVERCROWDING) ----- */
-        .app {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            width: 100vw;
-            background-color: #1e1e1e;
-        }
+    .app {
+      display: grid;
+      grid-template-rows: 48px 1fr;
+      height: 100vh;
+      width: 100vw;
+      background-color: #1e1e1e;
+    }
 
-        /* ---------- TOP BAR — ELEGANT, SPACIOUS ---------- */
-        .toolbar {
-            flex-shrink: 0;
-            background: #2d2d30;
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            border-bottom: 1px solid #3e3e42;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-            z-index: 10;
-        }
-        .toolbar button {
-            background: #0e6c9e;
-            border: none;
-            color: white;
-            padding: 10px 22px;
-            font-size: 14px;
-            font-weight: 500;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            letter-spacing: 0.4px;
-            border: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        .toolbar button:hover {
-            background: #1188c4;
-            border-color: rgba(255,255,255,0.3);
-        }
-        .toolbar button:active {
-            background: #0a4f7a;
-            transform: translateY(1px);
-        }
-        #current-folder-indicator {
-            color: #c0c0c0;
-            font-size: 14px;
-            margin-left: 10px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            padding: 6px 14px;
-            background: #252526;
-            border-radius: 5px;
-            border-left: 3px solid #0e6c9e;
-            flex: 1;
-            max-width: 400px;
-        }
+    /* ----- TOPBAR (fija, sobria) ----- */
+    .topbar {
+      background-color: #2d2d2d;
+      border-bottom: 1px solid #333333;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      color: #d4d4d4;
+      font-size: 14px;
+    }
 
-        /* ---------- MAIN ROW (EXPLORER + EDITOR) PERFECT PROPORTIONS ---------- */
-        .main {
-            display: flex;
-            flex: 1;
-            min-height: 0;
-            background: #1e1e1e;
-        }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
 
-        /* ---------- LEFT PANEL — FILE EXPLORER (TEXTISTIC STYLE) ---------- */
-        .explorer {
-            width: 320px;
-            background: #252526;
-            border-right: 1px solid #3e3e42;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            flex-shrink: 0;
-            box-shadow: 2px 0 8px rgba(0,0,0,0.3);
-        }
-        .explorer-header {
-            padding: 16px 20px;
-            font-size: 13px;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            color: #aaa;
-            background: #2a2a2c;
-            border-bottom: 1px solid #3e3e42;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        #tree-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px 0 20px 12px;
-            background: #252526;
-        }
-        /* --- Tree structure — clean, collapsible, file icons --- */
-        .tree {
-            list-style: none;
-            padding-left: 0;
-            margin: 0;
-            font-size: 13.5px;
-        }
-        .tree ul {
-            list-style: none;
-            padding-left: 20px;
-            margin-left: 6px;
-            border-left: 1px dashed #4a4a4a;
-        }
-        .tree li {
-            margin: 5px 0;
-            line-height: 1.6;
-        }
-        .folder-name {
-            cursor: pointer;
-            color: #e8e8e8;
-            display: inline-flex;
-            align-items: center;
-            padding: 6px 12px 6px 8px;
-            border-radius: 4px;
-            width: fit-content;
-            transition: background 0.1s;
-            font-weight: 500;
-            user-select: none;
-        }
-        .folder-name:hover {
-            background: #3a3a3e;
-        }
-        .folder-name::before {
-            content: "📁  ";
-            font-size: 14px;
-            margin-right: 6px;
-            color: #c49e5c;
-        }
-        .file-item {
-            cursor: pointer;
-            padding: 6px 12px 6px 36px;
-            border-radius: 4px;
-            color: #d4d4d4;
-            display: flex;
-            align-items: center;
-            position: relative;
-            transition: all 0.1s;
-            white-space: nowrap;
-        }
-        .file-item:hover {
-            background: #3a3a3e;
-            color: white;
-        }
-        .file-item::before {
-            content: "📄  ";
-            position: absolute;
-            left: 14px;
-            font-size: 14px;
-            color: #b0b0b0;
-        }
-        .hidden {
-            display: none !important;
-        }
-        .empty-tree-message {
-            color: #888;
-            padding: 24px;
-            text-align: center;
-            font-style: italic;
-            letter-spacing: 0.5px;
-        }
+    .topbar-left i {
+      color: #007acc;
+    }
 
-        /* ---------- CENTER: MONACO EDITOR — PERFECT FIT ---------- */
-        .editor-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: #1e1e1e;
-            position: relative;
-            overflow: hidden;
-            border-left: 1px solid #2d2d2d;
-        }
-        #editor {
-            width: 100%;
-            height: 100%;
-            min-height: 0;
-        }
+    .topbar-actions {
+      display: flex;
+      gap: 16px;
+    }
 
-        /* ---------- BOTTOM: TERMINAL — SIMULATED, BUT LOOKS 100% REAL ---------- */
-        .terminal-panel {
-            flex-shrink: 0;
-            height: 240px;
-            background: #1a1a1c;
-            border-top: 2px solid #3e3e42;
-            display: flex;
-            flex-direction: column;
-            color: #cccccc;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 13px;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.2);
-        }
-        .terminal-header {
-            background: #2d2d30;
-            padding: 8px 22px;
-            font-weight: 600;
-            color: #d4d4d4;
-            border-bottom: 1px solid #4a4a4a;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 1px;
-        }
-        .terminal-output {
-            flex: 1;
-            overflow-y: auto;
-            padding: 14px 22px;
-            background: #1a1a1c;
-            line-height: 1.7;
-            display: flex;
-            flex-direction: column;
-        }
-        .terminal-line {
-            color: #b3e6b3;
-            white-space: pre-wrap;
-            word-break: break-all;
-            border-bottom: 1px solid #2a2a2a;
-            padding: 4px 0;
-            font-family: 'Consolas', 'Monaco', monospace;
-        }
-        .terminal-line.error {
-            color: #f48771;
-            background: #2d1a1a;
-            padding-left: 8px;
-            border-left: 4px solid #f44;
-        }
-        .terminal-line.info {
-            color: #9cdcfe;
-        }
-        .timestamp {
-            color: #6a9955;
-            margin-right: 18px;
-            font-weight: 500;
-        }
-        /* ---------- SCROLLBARS (CLEAN) ---------- */
-        ::-webkit-scrollbar { width: 10px; height: 10px; }
-        ::-webkit-scrollbar-track { background: #1e1e1e; }
-        ::-webkit-scrollbar-thumb { background: #4a4a4a; border-radius: 6px; }
-        ::-webkit-scrollbar-thumb:hover { background: #6a6a6a; }
-    </style>
+    .btn {
+      background: transparent;
+      border: none;
+      color: #d4d4d4;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 450;
+      cursor: pointer;
+      transition: background 0.1s ease;
+    }
+
+    .btn:hover {
+      background: #3a3a3a;
+    }
+
+    .btn i {
+      width: 16px;
+      height: 16px;
+      stroke-width: 1.8;
+    }
+
+    /* ----- WORKSPACE (sidebar + editor) ----- */
+    .workspace {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      overflow: hidden;
+      background-color: #1e1e1e;
+    }
+
+    /* ----- SIDEBAR (árbol de archivos) ----- */
+    .sidebar {
+      background-color: #252526;
+      border-right: 1px solid #333333;
+      overflow-y: auto;
+      padding: 16px 0 16px 12px;
+      font-size: 13px;
+      user-select: none;
+    }
+
+    /* Estilo árbol */
+    .tree {
+      list-style: none;
+      margin-left: 0;
+      padding-left: 0;
+    }
+
+    .tree ul {
+      list-style: none;
+      padding-left: 20px;
+      margin-left: 0;
+    }
+
+    .tree li {
+      line-height: 28px;
+      white-space: nowrap;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tree-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 8px 0 4px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #cccccc;
+      height: 28px;
+    }
+
+    .tree-item:hover {
+      background-color: #2a2d2e;
+    }
+
+    .tree-item.active {
+      background-color: #2a3f4f;
+      color: white;
+    }
+
+    .tree-item i {
+      width: 16px;
+      height: 16px;
+      stroke-width: 1.5;
+      flex-shrink: 0;
+    }
+
+    .expand-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      color: #b0b0b0;
+    }
+
+    .file-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ----- ÁREA EDITOR (pestañas + monaco) ----- */
+    .editor-area {
+      display: grid;
+      grid-template-rows: 36px 1fr;
+      background-color: #1e1e1e;
+      overflow: hidden;
+    }
+
+    .tabs {
+      display: flex;
+      background-color: #252526;
+      border-bottom: 1px solid #333333;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: #4a4a4a #2d2d2d;
+    }
+
+    .tabs::-webkit-scrollbar {
+      height: 3px;
+    }
+    .tabs::-webkit-scrollbar-thumb {
+      background: #4a4a4a;
+    }
+
+    .tab {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+      background-color: #2d2d2d;
+      border-right: 1px solid #3e3e3e;
+      color: #b0b0b0;
+      font-size: 13px;
+      height: 36px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.1s;
+    }
+
+    .tab.active {
+      background-color: #1e1e1e;
+      color: #ffffff;
+      border-bottom: 2px solid #007acc;
+    }
+
+    .tab.dirty .tab-label::after {
+      content: "●";
+      margin-left: 6px;
+      font-size: 14px;
+      color: #ff9800;
+    }
+
+    .tab-close {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 3px;
+      color: #b0b0b0;
+    }
+    .tab-close:hover {
+      background-color: #4a4a4a;
+      color: white;
+    }
+    .tab-close i {
+      width: 14px;
+      height: 14px;
+    }
+
+    #editor {
+      width: 100%;
+      height: 100%;
+      background-color: #1e1e1e;
+    }
+
+    /* ----- PANTALLA INICIAL (Open Folder grande) ----- */
+    .welcome {
+      position: absolute;
+      top: 48px;
+      left: 0;
+      width: 100vw;
+      height: calc(100vh - 48px);
+      background-color: #1e1e1e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .welcome-card {
+      background: #252526;
+      padding: 48px 64px;
+      border-radius: 12px;
+      border: 1px solid #3a3a3a;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    .welcome-card i {
+      width: 48px;
+      height: 48px;
+      color: #007acc;
+      margin-bottom: 24px;
+    }
+
+    .welcome-card h2 {
+      font-weight: 400;
+      font-size: 24px;
+      margin-bottom: 28px;
+      color: #e0e0e0;
+    }
+
+    .btn-open-folder {
+      background: #007acc;
+      color: white;
+      padding: 12px 32px;
+      border-radius: 6px;
+      font-size: 16px;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-open-folder:hover {
+      background: #005fa3;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Tipografía monoespaciada para el editor (Monaco ya la incluye) */
+    .editor-area {
+      font-family: 'Fira Code', 'JetBrains Mono', 'Cascadia Code', monospace;
+    }
+
+    /* Pequeño mensaje de guardado */
+    .save-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #2d2d2d;
+      color: #d4d4d4;
+      padding: 10px 20px;
+      border-radius: 6px;
+      border-left: 4px solid #007acc;
+      font-size: 13px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      opacity: 0.9;
+      pointer-events: none;
+      z-index: 200;
+      transition: opacity 0.2s;
+    }
+  </style>
 </head>
 <body>
-    <div class="app">
-        <!-- TOP TOOLBAR — OPEN FOLDER & SAVE, CLEAN STATUS -->
-        <div class="toolbar">
-            <button id="openFolderBtn">
-                <span style="font-size:16px;">📂</span> OPEN FOLDER
-            </button>
-            <button id="saveBtn">
-                <span style="font-size:16px;">💾</span> SAVE
-            </button>
-            <span id="current-folder-indicator">⏺ no active folder</span>
-        </div>
+<div class="app">
 
-        <!-- MAIN WORKSPACE: EXPLORER + MONACO -->
-        <div class="main">
-            <!-- LEFT: FILE TREE (TEXTISTIC DARK) -->
-            <div class="explorer">
-                <div class="explorer-header">
-                    <span>📁 WORKSPACE</span>
-                    <span style="color:#888;font-size:11px;">FILES</span>
-                </div>
-                <div id="tree-container">
-                    <div class="empty-tree-message">◇ open a folder to browse files</div>
-                </div>
-            </div>
-
-            <!-- CENTER: MONACO EDITOR (VS DARK) -->
-            <div class="editor-container">
-                <div id="editor"></div>
-            </div>
-        </div>
-
-        <!-- BOTTOM: SIMULATED TERMINAL — PROFESSIONAL LOGGING -->
-        <div class="terminal-panel">
-            <div class="terminal-header">
-                <span>⬢ TERMINAL</span>
-                <span style="color:#888; font-weight:400; margin-left:auto;">simulated — double‑click header clear</span>
-            </div>
-            <div id="terminal-output" class="terminal-output">
-                <div class="terminal-line"><span class="timestamp">⚡</span> Textastic • ready · open a folder (Chrome/Edge desktop)</div>
-            </div>
-        </div>
+  <!-- TOPBAR FIJA (siempre visible) -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <i data-lucide="code-2" style="color: #007acc;" width="20" height="20"></i>
+      <span>Textastic · Professional</span>
     </div>
+    <div class="topbar-actions">
+      <button id="saveBtn" class="btn" title="Guardar (Ctrl+S)">
+        <i data-lucide="save" width="16" height="16"></i>
+        <span>Guardar</span>
+      </button>
+      <button id="openFolderTopbarBtn" class="btn">
+        <i data-lucide="folder-open" width="16" height="16"></i>
+        <span>Abrir carpeta</span>
+      </button>
+    </div>
+  </header>
 
-    <script>
-        (function(){
-            "use strict";
+  <!-- WORKSPACE (oculto inicialmente) -->
+  <div id="workspaceContainer" class="workspace hidden">
+    <!-- SIDEBAR con árbol de archivos -->
+    <aside class="sidebar" id="sidebar">
+      <!-- el árbol se renderiza dinámicamente -->
+    </aside>
 
-            // ---------- PROFESSIONAL STATE — NO SIMULATION, REAL FILES ----------
-            let editor;
-            let editorReady = false;
-            let currentFileHandle = null;
-            let currentDirectoryHandle = null;
-            let fileHandleMap = new Map();  // optional but robust
+    <!-- ÁREA EDITOR con pestañas y Monaco -->
+    <main class="editor-area">
+      <div class="tabs" id="tabsContainer"></div>
+      <div id="editor"></div>
+    </main>
+  </div>
 
-            // DOM elements
-            const treeContainer = document.getElementById('tree-container');
-            const terminalOutput = document.getElementById('terminal-output');
-            const folderIndicator = document.getElementById('current-folder-indicator');
-            const openFolderBtn = document.getElementById('openFolderBtn');
-            const saveBtn = document.getElementById('saveBtn');
+  <!-- PANTALLA INICIAL: Open Folder -->
+  <div id="welcomeScreen" class="welcome">
+    <div class="welcome-card">
+      <i data-lucide="file-text" width="48" height="48" stroke-width="1.5"></i>
+      <h2>Abrir carpeta local</h2>
+      <button id="welcomeOpenFolderBtn" class="btn-open-folder">
+        <i data-lucide="folder-open" width="20" height="20"></i>
+        Seleccionar carpeta
+      </button>
+      <p style="margin-top: 32px; color: #8a8a8a; font-size: 13px;">Editor profesional · Sin servidor</p>
+    </div>
+  </div>
+</div>
 
-            // ---------- MONACO INIT (VS DARK, PROFESSIONAL) ----------
-            function initMonaco() {
-                require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.34.1/min/vs' } });
-                require(['vs/editor/editor.main'], function() {
-                    editor = monaco.editor.create(document.getElementById('editor'), {
-                        value: '// select or create a file from the explorer',
-                        language: 'plaintext',
-                        theme: 'vs-dark',
-                        automaticLayout: true,
-                        wordWrap: 'on',
-                        fontSize: 14,
-                        fontFamily: 'SF Mono, Monaco, "Cascadia Code", Consolas, monospace',
-                        minimap: { enabled: true, scale: 1 },
-                        scrollBeyondLastLine: false,
-                        lineNumbers: 'on',
-                        renderWhitespace: 'selection',
-                        bracketPairColorization: { enabled: true },
-                        fontSize: 14,
-                        padding: { top: 16 }
-                    });
-                    editorReady = true;
-                    logTerminal('✅ Monaco editor loaded — vs‑dark', 'info');
-                });
+<!-- Notificación de guardado -->
+<div id="saveToast" class="save-toast hidden">✓ Archivo guardado</div>
+
+<script>
+  (async function() {
+    // ------ CONFIGURACIÓN MONACO (AMD loader) ------
+    const monacoReady = new Promise((resolve) => {
+      require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/min/vs' } });
+      require(['vs/editor/editor.main'], function() {
+        resolve(window.monaco);
+      });
+    });
+    const monaco = await monacoReady;
+
+    // ------ ESTADO GLOBAL ------
+    let rootDirectoryHandle = null;               // FileSystemDirectoryHandle raíz
+    const expandedPaths = new Set(['']);          // rutas expandidas ('' = raíz)
+    let openFiles = [];                          // archivos abiertos { id, name, handle, model, originalContent, dirty, language, path }
+    let activeFileId = null;                    // ID del archivo activo
+    let editorInstance = null;                 // instancia Monaco
+    const fileHandleMap = new Map();           // ruta -> FileSystemFileHandle (para acceso rápido)
+
+    // Elementos DOM
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const workspaceContainer = document.getElementById('workspaceContainer');
+    const sidebarEl = document.getElementById('sidebar');
+    const tabsContainer = document.getElementById('tabsContainer');
+    const saveBtn = document.getElementById('saveBtn');
+    const openFolderTopbarBtn = document.getElementById('openFolderTopbarBtn');
+    const welcomeOpenFolderBtn = document.getElementById('welcomeOpenFolderBtn');
+    const saveToast = document.getElementById('saveToast');
+
+    // Utilidad para mostrar notificación breve
+    function showSaveMessage(msg = '✓ Archivo guardado') {
+      saveToast.textContent = msg;
+      saveToast.classList.remove('hidden');
+      setTimeout(() => saveToast.classList.add('hidden'), 2000);
+    }
+
+    // Mapeo de extensiones a lenguaje Monaco
+    function getLanguageFromExtension(filename) {
+      const ext = filename.split('.').pop().toLowerCase();
+      const map = {
+        js: 'javascript', ts: 'typescript', jsx: 'javascript', tsx: 'typescript',
+        html: 'html', css: 'css', json: 'json', md: 'markdown',
+        py: 'python', rb: 'ruby', go: 'go', rs: 'rust', java: 'java',
+        cpp: 'cpp', c: 'c', php: 'php', xml: 'xml', yaml: 'yaml',
+        sh: 'shell', sql: 'sql', swift: 'swift', kt: 'kotlin'
+      };
+      return map[ext] || 'plaintext';
+    }
+
+    // ----- ÁRBOL DE ARCHIVOS (renderizado recursivo asíncrono) -----
+    async function renderSidebar() {
+      if (!rootDirectoryHandle) return;
+      sidebarEl.innerHTML = ''; 
+      const treeRoot = await buildTree(rootDirectoryHandle, '');
+      sidebarEl.appendChild(treeRoot);
+      // refrescar iconos Lucide
+      lucide.createIcons();
+    }
+
+    // Construye <ul> para un directorio
+    async function buildTree(directoryHandle, currentPath) {
+      const ul = document.createElement('ul');
+      ul.className = 'tree';
+
+      for await (const [name, handle] of directoryHandle.entries()) {
+        const li = document.createElement('li');
+        const itemPath = currentPath ? `${currentPath}/${name}` : name;
+        const div = document.createElement('div');
+        div.className = 'tree-item';
+        div.dataset.path = itemPath;
+        div.dataset.kind = handle.kind;
+
+        // ----- Icono expandir/colapsar (solo directorios) -----
+        if (handle.kind === 'directory') {
+          const expandSpan = document.createElement('span');
+          expandSpan.className = 'expand-icon';
+          const isExpanded = expandedPaths.has(itemPath);
+          const expandIcon = document.createElement('i');
+          expandIcon.dataset.lucide = isExpanded ? 'chevron-down' : 'chevron-right';
+          expandSpan.appendChild(expandIcon);
+          expandSpan.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            if (expandedPaths.has(itemPath)) {
+              expandedPaths.delete(itemPath);
+            } else {
+              expandedPaths.add(itemPath);
             }
+            await renderSidebar(); // re-render completo
+          });
+          div.appendChild(expandSpan);
+        } else {
+          // alinear archivos (espaciado)
+          const spacer = document.createElement('span');
+          spacer.style.width = '20px';
+          spacer.style.display = 'inline-block';
+          div.appendChild(spacer);
+        }
 
-            // ---------- TERMINAL LOG (REAL FEEDBACK, NOT FAKE) ----------
-            function logTerminal(message, type = 'info') {
-                const line = document.createElement('div');
-                line.className = 'terminal-line ' + (type === 'error' ? 'error' : 'info');
-                const now = new Date();
-                const timeStr = `[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}]`;
-                line.innerHTML = `<span class="timestamp">${timeStr}</span> ${message}`;
-                terminalOutput.appendChild(line);
-                terminalOutput.scrollTop = terminalOutput.scrollHeight;
-                // keep max 200 lines for performance
-                while (terminalOutput.children.length > 200) {
-                    terminalOutput.removeChild(terminalOutput.children[0]);
-                }
-            }
+        // ----- Icono de carpeta / archivo -----
+        const icon = document.createElement('i');
+        if (handle.kind === 'directory') {
+          icon.dataset.lucide = expandedPaths.has(itemPath) ? 'folder-open' : 'folder';
+        } else {
+          icon.dataset.lucide = 'file';
+        }
+        div.appendChild(icon);
 
-            // ---------- DETECT LANGUAGE FROM EXTENSION ----------
-            function getLanguageFromExtension(filename) {
-                const ext = filename.slice(filename.lastIndexOf('.')).toLowerCase();
-                const langMap = {
-                    '.js': 'javascript', '.ts': 'typescript', '.jsx': 'javascript', '.tsx': 'typescript',
-                    '.html': 'html', '.htm': 'html', '.css': 'css', '.scss': 'scss', '.less': 'less',
-                    '.json': 'json', '.xml': 'xml', '.yaml': 'yaml', '.yml': 'yaml',
-                    '.md': 'markdown', '.py': 'python', '.rb': 'ruby', '.php': 'php',
-                    '.java': 'java', '.c': 'c', '.cpp': 'cpp', '.h': 'cpp', '.cs': 'csharp',
-                    '.go': 'go', '.rs': 'rust', '.swift': 'swift', '.kt': 'kotlin',
-                    '.sh': 'shell', '.bash': 'shell', '.bat': 'bat', '.ps1': 'powershell',
-                    '.sql': 'sql', '.txt': 'plaintext', '.log': 'plaintext',
-                    '.toml': 'plaintext', '.ini': 'ini', '.cfg': 'ini',
-                    '.vue': 'html', '.svelte': 'html', '.astro': 'html'
-                };
-                return langMap[ext] || 'plaintext';
-            }
+        // ----- Nombre -----
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'file-name';
+        nameSpan.textContent = name;
+        div.appendChild(nameSpan);
 
-            // ---------- OPEN FILE (REAL, FROM HANDLE) ----------
-            async function openFileFromHandle(fileHandle, domElement) {
-                if (!editorReady) {
-                    logTerminal('⌛ editor still loading — please wait', 'error');
-                    return;
-                }
-                try {
-                    const file = await fileHandle.getFile();
-                    const content = await file.text();
-                    editor.setValue(content);
-                    currentFileHandle = fileHandle;
-                    const lang = getLanguageFromExtension(fileHandle.name);
-                    monaco.editor.setModelLanguage(editor.getModel(), lang);
-                    logTerminal(`📂 opened: ${fileHandle.name} (${lang})`, 'info');
-                    folderIndicator.textContent = `📁 ${currentDirectoryHandle?.name || ''} · ${fileHandle.name}`;
-                } catch (err) {
-                    logTerminal(`❌ error opening file: ${err.message}`, 'error');
-                }
-            }
+        // ----- Evento click: archivo -> abrir; carpeta (solo icono expande) -----
+        if (handle.kind === 'file') {
+          div.addEventListener('click', (e) => {
+            if (e.target.closest('.expand-icon')) return;
+            openFileFromHandle(handle, name, itemPath);
+          });
+        }
 
-            // ---------- SAVE CURRENT FILE (REAL OVERWRITE) ----------
-            async function saveCurrentFile() {
-                if (!currentFileHandle) {
-                    logTerminal('⚠ no file open — use save on an opened file', 'error');
-                    return;
-                }
-                if (!editorReady) return;
-                try {
-                    const content = editor.getValue();
-                    const writable = await currentFileHandle.createWritable();
-                    await writable.write(content);
-                    await writable.close();
-                    logTerminal(`💾 saved: ${currentFileHandle.name}`, 'info');
-                } catch (err) {
-                    logTerminal(`❌ save failed: ${err.message}`, 'error');
-                }
-            }
+        li.appendChild(div);
 
-            // ---------- RECURSIVE DIRECTORY TRAVERSAL (PERFECT TREE) ----------
-            async function buildTree(dirHandle, parentUl, path) {
-                for await (const entry of dirHandle.values()) {
-                    const li = document.createElement('li');
-                    if (entry.kind === 'directory') {
-                        // folder item
-                        const folderSpan = document.createElement('span');
-                        folderSpan.className = 'folder-name';
-                        folderSpan.textContent = entry.name;
-                        li.appendChild(folderSpan);
-                        const childUl = document.createElement('ul');
-                        childUl.classList.add('tree', 'nested');
-                        li.appendChild(childUl);
-                        parentUl.appendChild(li);
-                        await buildTree(entry, childUl, path + entry.name + '/');
-                    } else {
-                        // file item
-                        li.className = 'file-item';
-                        li.textContent = entry.name;
-                        li.fileHandle = entry;     // store handle directly on DOM
-                        li.dataset.path = path + entry.name;
-                        parentUl.appendChild(li);
-                    }
-                }
-            }
+        // ----- Hijos recursivos (si directorio y expandido) -----
+        if (handle.kind === 'directory' && expandedPaths.has(itemPath)) {
+          const childUl = await buildTree(handle, itemPath);
+          li.appendChild(childUl);
+        }
 
-            // ---------- OPEN FOLDER USING FILE SYSTEM ACCESS API (REAL) ----------
-            async function openFolder() {
-                if (!window.showDirectoryPicker) {
-                    logTerminal('❌ FILE SYSTEM ACCESS API NOT SUPPORTED — use Chrome/Edge desktop (HTTPS/localhost)', 'error');
-                    return;
-                }
-                try {
-                    const dirHandle = await window.showDirectoryPicker();
-                    currentDirectoryHandle = dirHandle;
-                    folderIndicator.textContent = `📁 ${dirHandle.name}`;
-                    logTerminal(`📂 folder opened: ${dirHandle.name}`, 'info');
+        ul.appendChild(li);
+      }
+      return ul;
+    }
 
-                    // reset tree and current file
-                    treeContainer.innerHTML = '';
-                    currentFileHandle = null;
-                    editor.setValue('// select a file from the explorer');
-                    monaco.editor.setModelLanguage(editor.getModel(), 'plaintext');
+    // ----- ABRIR ARCHIVO (leer, crear modelo, pestaña) -----
+    async function openFileFromHandle(fileHandle, fileName, filePath) {
+      try {
+        // ¿Ya está abierto?
+        const existing = openFiles.find(f => f.path === filePath);
+        if (existing) {
+          setActiveFile(existing.id);
+          return;
+        }
 
-                    const rootUl = document.createElement('ul');
-                    rootUl.className = 'tree';
-                    await buildTree(dirHandle, rootUl, '');
-                    treeContainer.appendChild(rootUl);
+        const file = await fileHandle.getFile();
+        const content = await file.text();
+        const language = getLanguageFromExtension(fileName);
+        
+        // Crear modelo Monaco
+        const model = monaco.editor.createModel(content, language);
+        
+        const fileId = crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + fileName;
+        const newFile = {
+          id: fileId,
+          name: fileName,
+          handle: fileHandle,
+          model,
+          originalContent: content,
+          dirty: false,
+          language,
+          path: filePath
+        };
 
-                    if (rootUl.children.length === 0) {
-                        treeContainer.innerHTML = '<div class="empty-tree-message">📁 folder is empty</div>';
-                    }
-                } catch (err) {
-                    if (err.name !== 'AbortError') {
-                        logTerminal(`❌ folder open error: ${err.message}`, 'error');
-                    }
-                }
-            }
+        // Listener de cambios en el modelo
+        model.onDidChangeContent(() => {
+          const currentContent = model.getValue();
+          const isDirty = currentContent !== newFile.originalContent;
+          if (newFile.dirty !== isDirty) {
+            newFile.dirty = isDirty;
+            renderTabs();
+            // también actualizar indicador en pestaña activa
+          }
+        });
 
-            // ---------- EVENT DELEGATION (COLLAPSE / FILE CLICK) ----------
-            function attachTreeEvents() {
-                treeContainer.addEventListener('click', async (e) => {
-                    // folder collapse/expand
-                    const folder = e.target.closest('.folder-name');
-                    if (folder) {
-                        e.stopPropagation();
-                        const parentLi = folder.closest('li');
-                        const childUl = parentLi.querySelector('ul');
-                        if (childUl) childUl.classList.toggle('hidden');
-                        return;
-                    }
-                    // file click
-                    const fileItem = e.target.closest('.file-item');
-                    if (fileItem && fileItem.fileHandle) {
-                        e.preventDefault();
-                        await openFileFromHandle(fileItem.fileHandle, fileItem);
-                    }
-                });
-            }
+        openFiles.push(newFile);
+        fileHandleMap.set(filePath, fileHandle);
+        setActiveFile(fileId);
+        renderTabs();
+      } catch (err) {
+        console.error('Error al abrir archivo:', err);
+        alert('No se pudo leer el archivo. Permiso denegado?');
+      }
+    }
 
-            // ---------- DOUBLE-CLICK TERMINAL HEADER CLEAR ----------
-            document.querySelector('.terminal-header').addEventListener('dblclick', function() {
-                terminalOutput.innerHTML = '<div class="terminal-line"><span class="timestamp">⚡</span> terminal cleared</div>';
-            });
+    // ----- ACTIVAR PESTAÑA Y MODELO EN EDITOR -----
+    function setActiveFile(fileId) {
+      const file = openFiles.find(f => f.id === fileId);
+      if (!file) return;
+      activeFileId = fileId;
+      if (editorInstance) {
+        editorInstance.setModel(file.model);
+      }
+      renderTabs();
+      highlightActiveFileInSidebar(file.path);
+    }
 
-            // ---------- WARN IF API MISSING (BUTTON STILL WORKS) ----------
-            if (!window.showDirectoryPicker) {
-                logTerminal('⚠ File System Access API unavailable — this app requires Chrome/Edge desktop', 'error');
-            }
+    // Resalta archivo activo en sidebar
+    function highlightActiveFileInSidebar(path) {
+      // quitar clase active de todos
+      document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('active'));
+      // activar el que coincida
+      const activeItem = document.querySelector(`.tree-item[data-path="${path}"]`);
+      if (activeItem) activeItem.classList.add('active');
+    }
 
-            // ---------- INITIALISE ----------
-            initMonaco();
-            openFolderBtn.addEventListener('click', openFolder);
-            saveBtn.addEventListener('click', saveCurrentFile);
-            attachTreeEvents();
+    // ----- RENDER PESTAÑAS -----
+    function renderTabs() {
+      if (!tabsContainer) return;
+      if (openFiles.length === 0) {
+        tabsContainer.innerHTML = '';
+        if (editorInstance) {
+          editorInstance.setModel(monaco.editor.createModel('Selecciona un archivo para empezar a editar', 'plaintext'));
+        }
+        return;
+      }
 
-            // ---------- PROFESSIONAL TOUCH: DRAG FILE? (not required but graceful) ----------
-            // no drag, pure file system api — exactly like Textastic
-        })();
-    </script>
+      let html = '';
+      openFiles.forEach(file => {
+        const activeClass = (activeFileId === file.id) ? 'active' : '';
+        const dirtyClass = file.dirty ? 'dirty' : '';
+        html += `<div class="tab ${activeClass} ${dirtyClass}" data-file-id="${file.id}">
+          <span class="tab-label">${file.name}</span>
+          <span class="tab-close" data-file-id="${file.id}" data-close-tab>
+            <i data-lucide="x" width="14" height="14"></i>
+          </span>
+        </div>`;
+      });
+      tabsContainer.innerHTML = html;
+      
+      // Eventos: clic en pestaña activar, clic en cerrar
+      tabsContainer.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+          if (e.target.closest('.tab-close')) return;
+          const fileId = tab.dataset.fileId;
+          setActiveFile(fileId);
+        });
+      });
 
-    <!--
-        ════════════════════════════════════════════════════════════════
-        TEXTISTIC · PROFESSIONAL WEB CODE EDITOR
-        ———————————————————————————————————————————
-        ✓ Monaco editor (vs‑dark) from CDN
-        ✓ Real File System Access API — no simulation
-        ✓ Open folder → full recursive tree, collapsible
-        ✓ Click file → open in editor, language detection
-        ✓ Save button → overwrite original file
-        ✓ Terminal logs real operations (simulated UI, real events)
-        ✓ Pure vanilla JS, one HTML file, Chrome/Edge desktop only
-        ✓ UI inspired by Textastic: spacious, clean, dark
-        ════════════════════════════════════════════════════════════════
-    -->
+      tabsContainer.querySelectorAll('.tab-close').forEach(closeBtn => {
+        closeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const fileId = closeBtn.dataset.fileId;
+          closeTab(fileId);
+        });
+      });
+
+      lucide.createIcons();
+    }
+
+    // ----- CERRAR PESTAÑA (con confirmación si dirty) -----
+    async function closeTab(fileId) {
+      const fileIndex = openFiles.findIndex(f => f.id === fileId);
+      if (fileIndex === -1) return;
+      const file = openFiles[fileIndex];
+      
+      if (file.dirty) {
+        const confirmClose = confirm(`Hay cambios sin guardar en ${file.name}. ¿Cerrar igualmente?`);
+        if (!confirmClose) return;
+      }
+
+      // Dispose del modelo
+      file.model.dispose();
+      openFiles.splice(fileIndex, 1);
+      
+      // Si era el activo, activar otro
+      if (activeFileId === fileId) {
+        if (openFiles.length > 0) {
+          setActiveFile(openFiles[0].id);
+        } else {
+          activeFileId = null;
+          editorInstance.setModel(monaco.editor.createModel('Selecciona un archivo para empezar a editar', 'plaintext'));
+        }
+      }
+      renderTabs();
+    }
+
+    // ----- GUARDAR ARCHIVO ACTIVO -----
+    async function saveActiveFile() {
+      if (!activeFileId) {
+        showSaveMessage('✗ No hay archivo activo');
+        return;
+      }
+      const file = openFiles.find(f => f.id === activeFileId);
+      if (!file) return;
+      
+      try {
+        const writable = await file.handle.createWritable();
+        const content = file.model.getValue();
+        await writable.write(content);
+        await writable.close();
+        
+        // Actualizar contenido original y marcar como limpio
+        file.originalContent = content;
+        file.dirty = false;
+        renderTabs();
+        showSaveMessage(`✓ ${file.name} guardado`);
+      } catch (err) {
+        console.error('Error al guardar:', err);
+        alert('No se pudo guardar el archivo. Permiso revocado?');
+      }
+    }
+
+    // ----- ABRIR CARPETA (showDirectoryPicker) -----
+    async function openFolder() {
+      if (!window.showDirectoryPicker) {
+        alert('La File System Access API no está soportada en este navegador. Usa Chrome/Edge 86+');
+        return;
+      }
+      
+      // Si hay archivos sin guardar, preguntar
+      if (openFiles.some(f => f.dirty)) {
+        const confirm = window.confirm('Hay cambios sin guardar. ¿Abrir otra carpeta? Se perderán los cambios no guardados.');
+        if (!confirm) return;
+      }
+      
+      try {
+        const dirHandle = await window.showDirectoryPicker();
+        rootDirectoryHandle = dirHandle;
+        
+        // Resetear estado
+        openFiles.forEach(f => f.model.dispose());
+        openFiles = [];
+        activeFileId = null;
+        expandedPaths.clear();
+        expandedPaths.add(''); // raíz expandida
+        fileHandleMap.clear();
+        
+        // Mostrar workspace, ocultar welcome
+        welcomeScreen.classList.add('hidden');
+        workspaceContainer.classList.remove('hidden');
+        
+        // Inicializar editor si no existe
+        if (!editorInstance) {
+          editorInstance = monaco.editor.create(document.getElementById('editor'), {
+            value: 'Selecciona un archivo para empezar a editar',
+            language: 'plaintext',
+            theme: 'vs-dark',
+            automaticLayout: true,
+            fontSize: 14,
+            fontFamily: 'Fira Code, JetBrains Mono, Cascadia Code, monospace',
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false
+          });
+        } else {
+          editorInstance.setModel(monaco.editor.createModel('Selecciona un archivo para empezar a editar', 'plaintext'));
+        }
+
+        await renderSidebar();
+        renderTabs();
+      } catch (err) {
+        if (err.name === 'AbortError') return; // usuario canceló
+        console.error('Error al abrir carpeta:', err);
+        alert('No se pudo abrir la carpeta.');
+      }
+    }
+
+    // ----- EVENT LISTENERS -----
+    welcomeOpenFolderBtn.addEventListener('click', openFolder);
+    openFolderTopbarBtn.addEventListener('click', openFolder);
+    saveBtn.addEventListener('click', saveActiveFile);
+
+    // Ctrl + S global
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        saveActiveFile();
+      }
+    });
+
+    // Inicial: mostrar bienvenida, workspace oculto
+    // Monaco listo, creamos editor vacío (pero oculto)
+    editorInstance = monaco.editor.create(document.getElementById('editor'), {
+      value: 'Selecciona una carpeta para comenzar',
+      language: 'plaintext',
+      theme: 'vs-dark',
+      automaticLayout: true,
+      fontFamily: 'Fira Code, JetBrains Mono, monospace',
+      minimap: { enabled: false }
+    });
+    workspaceContainer.classList.add('hidden'); // aseguramos
+
+    // Iconos iniciales
+    lucide.createIcons();
+  })();
+</script>
+
 </body>
 </html>

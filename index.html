@@ -10,11 +10,12 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
+    /* ----- RESET PROFESIONAL ----- */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
     body {
       background: #1e1e1e;
@@ -22,7 +23,7 @@
       overflow: hidden;
       color: #d4d4d4;
     }
-    /* SPLASH */
+    /* ----- SPLASH SCREEN ----- */
     .splash {
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
@@ -64,7 +65,7 @@
     .btn-primary:hover {
       background: #005fa3;
     }
-    /* APP */
+    /* ----- APLICACIÓN PRINCIPAL ----- */
     .app {
       display: grid;
       grid-template-rows: 52px 1fr;
@@ -75,7 +76,7 @@
     .hidden {
       display: none !important;
     }
-    /* TOPBAR */
+    /* ----- TOPBAR ----- */
     .topbar {
       background: #2d2d2d;
       border-bottom: 1px solid #333;
@@ -122,7 +123,7 @@
       width: 16px;
       height: 16px;
     }
-    /* WORKSPACE */
+    /* ----- WORKSPACE (SIDEBAR + EDITOR) ----- */
     .workspace {
       display: grid;
       grid-template-columns: 280px 1fr;
@@ -132,19 +133,19 @@
       .workspace { grid-template-columns: 1fr; }
       .sidebar { display: none; }
     }
-    /* SIDEBAR */
+    /* ----- SIDEBAR (ÁRBOL DE ARCHIVOS) ----- */
     .sidebar {
       background: #252526;
       border-right: 1px solid #333;
       overflow-y: auto;
       padding: 16px 0;
+      font-size: 13px;
     }
-    .tree {
+    .tree, .tree ul {
       list-style: none;
       padding-left: 0;
     }
     .tree ul {
-      list-style: none;
       padding-left: 20px;
     }
     .tree-item {
@@ -185,7 +186,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    /* EDITOR */
+    /* ----- EDITOR ----- */
     .editor-area {
       display: grid;
       grid-template-rows: 36px 1fr;
@@ -243,7 +244,7 @@
       height: 100%;
       background: #1e1e1e;
     }
-    /* TOAST */
+    /* ----- TOAST (NOTIFICACIÓN) ----- */
     .toast {
       position: fixed;
       bottom: 24px;
@@ -260,7 +261,7 @@
   </style>
 </head>
 <body>
-  <!-- SPLASH -->
+  <!-- SPLASH SCREEN -->
   <div id="splash-screen" class="splash">
     <div class="splash-content">
       <h1>NEXEDIT</h1>
@@ -271,7 +272,7 @@
     </div>
   </div>
 
-  <!-- APLICACIÓN -->
+  <!-- APLICACIÓN PRINCIPAL -->
   <div id="app" class="app hidden">
     <header class="topbar">
       <div class="topbar-left">
@@ -289,7 +290,9 @@
     </header>
 
     <div class="workspace">
-      <aside class="sidebar" id="sidebar"></aside>
+      <aside class="sidebar" id="sidebar">
+        <!-- El árbol se generará dinámicamente -->
+      </aside>
       <main class="editor-area">
         <div class="tabs" id="tabs-container"></div>
         <div id="editor-container"></div>
@@ -297,10 +300,10 @@
     </div>
   </div>
 
-  <!-- INPUT SELECCIÓN DE CARPETA -->
+  <!-- INPUT OCULTO PARA SELECCIONAR CARPETA (webkitdirectory) -->
   <input type="file" id="folder-picker" webkitdirectory style="display: none;" />
 
-  <!-- TOAST -->
+  <!-- TOAST NOTIFICACIÓN -->
   <div id="save-toast" class="toast hidden">✓ Archivo guardado</div>
 
   <script>
@@ -328,10 +331,10 @@
       const toast = document.getElementById('save-toast');
 
       // ------------------------------------------------------------
-      // 3. ESTADO GLOBAL (SENCILLO Y DIRECTO)
+      // 3. ESTADO GLOBAL (SENCILLO, ROBUSTO)
       // ------------------------------------------------------------
-      let files = [];                 // Todos los archivos de la carpeta { name, path, fileObject, content, language }
-      let openFiles = [];            // Archivos abiertos { id, name, path, model, dirty, originalContent }
+      let files = [];               // Todos los archivos: { path, name, file, content, language }
+      let openFiles = [];          // Archivos abiertos: { id, path, name, model, dirty, originalContent }
       let activeFileId = null;
       let expandedFolders = new Set(['']); // Rutas expandidas
 
@@ -346,20 +349,38 @@
         setTimeout(() => toast.classList.add('hidden'), duration);
       }
 
+      // Mapeo COMPLETO de extensiones a lenguajes Monaco
       function getLanguageFromExtension(filename) {
         const ext = filename.split('.').pop().toLowerCase();
         const map = {
-          js: 'javascript', ts: 'typescript', jsx: 'javascript', tsx: 'typescript',
-          html: 'html', css: 'css', json: 'json', md: 'markdown',
-          py: 'python', rb: 'ruby', go: 'go', rs: 'rust', java: 'java',
-          cpp: 'cpp', c: 'c', php: 'php', xml: 'xml', yaml: 'yaml',
-          sh: 'shell', sql: 'sql', swift: 'swift', kt: 'kotlin'
+          // Web
+          'html': 'html', 'htm': 'html', 'css': 'css', 'scss': 'scss', 'less': 'less',
+          'js': 'javascript', 'jsx': 'javascript', 'ts': 'typescript', 'tsx': 'typescript',
+          'json': 'json', 'xml': 'xml', 'svg': 'xml',
+          // Backend
+          'py': 'python', 'rb': 'ruby', 'php': 'php', 'java': 'java', 'c': 'c',
+          'cpp': 'cpp', 'h': 'cpp', 'hpp': 'cpp', 'cs': 'csharp', 'go': 'go',
+          'rs': 'rust', 'swift': 'swift', 'kt': 'kotlin', 'kts': 'kotlin',
+          'sql': 'sql', 'sh': 'shell', 'bash': 'shell', 'yml': 'yaml', 'yaml': 'yaml',
+          'md': 'markdown', 'txt': 'plaintext', 'ini': 'ini', 'cfg': 'ini',
+          // Otros
+          'dockerfile': 'dockerfile', 'makefile': 'makefile'
         };
         return map[ext] || 'plaintext';
       }
 
+      // Leer archivo como texto
+      function readFileContent(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = reject;
+          reader.readAsText(file);
+        });
+      }
+
       // ------------------------------------------------------------
-      // 5. APERTURA DE CARPETA (UNIVERSAL)
+      // 5. APERTURA DE CARPETA (webkitdirectory)
       // ------------------------------------------------------------
       function openFolder() {
         folderPicker.click();
@@ -376,20 +397,20 @@
         activeFileId = null;
         expandedFolders = new Set(['']);
 
-        // Leer todos los archivos
+        // Leer todos los archivos del FileList
         for (let i = 0; i < fileList.length; i++) {
           const file = fileList[i];
           const path = file.webkitRelativePath;
           files.push({
-            name: file.name,
             path: path,
-            fileObject: file,
-            content: null,
+            name: file.name,
+            file: file,
+            content: null,        // Se leerá bajo demanda
             language: getLanguageFromExtension(file.name)
           });
         }
 
-        // Ordenar para que carpetas aparezcan antes (alfabético)
+        // Ordenar para que carpetas aparezcan primero en el árbol (alfabético)
         files.sort((a, b) => a.path.localeCompare(b.path));
 
         // Inicializar editor si no existe
@@ -418,7 +439,7 @@
       });
 
       // ------------------------------------------------------------
-      // 6. RENDERIZADO DEL ÁRBOL (SIN COMPLICACIONES)
+      // 6. RENDERIZAR ÁRBOL (estilo Textastic)
       // ------------------------------------------------------------
       function renderTree() {
         const rootUl = document.createElement('ul');
@@ -426,11 +447,15 @@
         buildTree(rootUl, '');
         sidebarEl.innerHTML = '';
         sidebarEl.appendChild(rootUl);
+        // Restaurar resaltado si hay archivo activo
+        if (activeFileId) {
+          const active = openFiles.find(f => f.id === activeFileId);
+          if (active) highlightActiveFileInSidebar(active.path);
+        }
       }
 
       function buildTree(parentUl, basePath) {
-        // Obtener nombres inmediatos (archivos y carpetas) dentro de basePath
-        const children = new Map(); // nombre -> { isDirectory, fullPath }
+        const children = new Map(); // key = fullPath, value = { name, fullPath, isDir }
 
         files.forEach(file => {
           const parts = file.path.split('/');
@@ -441,7 +466,6 @@
             current = current ? `${current}/${part}` : part;
             if (current === basePath) continue;
             if (prev === basePath || (basePath === '' && i === 0)) {
-              // Es hijo directo
               const name = part;
               const fullPath = current;
               const isDir = i < parts.length - 1;
@@ -452,7 +476,7 @@
           }
         });
 
-        // Convertir a array y ordenar (carpetas primero, luego archivos)
+        // Ordenar: carpetas primero, luego archivos, alfabético
         const sorted = Array.from(children.values()).sort((a, b) => {
           if (a.isDir && !b.isDir) return -1;
           if (!a.isDir && b.isDir) return 1;
@@ -466,7 +490,7 @@
           div.dataset.path = item.fullPath;
           div.dataset.kind = item.isDir ? 'directory' : 'file';
 
-          // Espaciador/expansor
+          // Espaciador / expandir
           if (item.isDir) {
             const expandSpan = document.createElement('span');
             expandSpan.className = 'expand-icon';
@@ -481,7 +505,7 @@
               } else {
                 expandedFolders.add(item.fullPath);
               }
-              renderTree(); // Simplificado: re-render todo
+              renderTree(); // Simplificado: re-render completo
             });
             div.appendChild(expandSpan);
           } else {
@@ -506,17 +530,9 @@
           nameSpan.textContent = item.name;
           div.appendChild(nameSpan);
 
-          // Evento click para archivos
-          if (!item.isDir) {
-            div.addEventListener('click', (e) => {
-              if (e.target.closest('.expand-icon')) return;
-              openFile(item.fullPath);
-            });
-          }
-
           li.appendChild(div);
 
-          // Si es carpeta y está expandida, renderizar hijos
+          // Hijos si es carpeta expandida
           if (item.isDir && expandedFolders.has(item.fullPath)) {
             const childUl = document.createElement('ul');
             buildTree(childUl, item.fullPath);
@@ -528,24 +544,46 @@
       }
 
       // ------------------------------------------------------------
-      // 7. ABRIR ARCHIVO (LECTURA Y MONACO)
+      // 7. DELEGACIÓN DE EVENTOS (100% FIABLE)
+      // ------------------------------------------------------------
+      sidebarEl.addEventListener('click', async (e) => {
+        const treeItem = e.target.closest('.tree-item');
+        if (!treeItem) return;
+        
+        const kind = treeItem.dataset.kind;
+        const path = treeItem.dataset.path;
+        
+        // Si es archivo, abrir
+        if (kind === 'file') {
+          e.preventDefault();
+          e.stopPropagation();
+          await openFile(path);
+        }
+        // Si es carpeta, el clic en el expand-icon ya tiene su propio listener
+        // pero podemos ignorar aquí
+      });
+
+      // ------------------------------------------------------------
+      // 8. ABRIR ARCHIVO (lectura + modelo Monaco)
       // ------------------------------------------------------------
       async function openFile(path) {
-        // Buscar archivo en la lista
         const fileData = files.find(f => f.path === path);
-        if (!fileData) return;
+        if (!fileData) {
+          showToastMessage('✗ Archivo no encontrado');
+          return;
+        }
 
-        // Verificar si ya está abierto
+        // Si ya está abierto, activarlo
         const existing = openFiles.find(f => f.path === path);
         if (existing) {
           setActiveFile(existing.id);
           return;
         }
 
-        // Leer contenido si no está en caché
+        // Leer contenido si no está cacheado
         if (!fileData.content) {
           try {
-            fileData.content = await readFile(fileData.fileObject);
+            fileData.content = await readFileContent(fileData.file);
           } catch (err) {
             showToastMessage('✗ Error al leer el archivo');
             return;
@@ -558,8 +596,8 @@
 
         const newFile = {
           id: fileId,
+          path: fileData.path,
           name: fileData.name,
-          path: path,
           model: model,
           dirty: false,
           originalContent: fileData.content
@@ -580,15 +618,6 @@
         setActiveFile(fileId);
       }
 
-      function readFile(file) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target.result);
-          reader.onerror = reject;
-          reader.readAsText(file);
-        });
-      }
-
       function setActiveFile(fileId) {
         const file = openFiles.find(f => f.id === fileId);
         if (!file) return;
@@ -605,7 +634,7 @@
       }
 
       // ------------------------------------------------------------
-      // 8. PESTAÑAS
+      // 9. PESTAÑAS
       // ------------------------------------------------------------
       function renderTabs() {
         if (openFiles.length === 0) {
@@ -626,7 +655,7 @@
         });
         tabsContainer.innerHTML = html;
 
-        // Eventos
+        // Eventos pestañas
         tabsContainer.querySelectorAll('.tab').forEach(tab => {
           tab.addEventListener('click', (e) => {
             if (e.target.closest('.tab-close')) return;
@@ -655,7 +684,7 @@
         }
 
         file.model.dispose();
-        const index = openFiles.indexOf(file);
+        const index = openFiles.findIndex(f => f.id === fileId);
         if (index !== -1) openFiles.splice(index, 1);
 
         if (activeFileId === fileId) {
@@ -670,7 +699,7 @@
       }
 
       // ------------------------------------------------------------
-      // 9. GUARDAR (DESCARGA UNIVERSAL)
+      // 10. GUARDAR (descarga universal)
       // ------------------------------------------------------------
       function saveActiveFile() {
         if (!activeFileId) {
@@ -689,15 +718,14 @@
         a.click();
         URL.revokeObjectURL(url);
 
-        // Actualizar estado
         file.originalContent = content;
         file.dirty = false;
         renderTabs();
-        showToastMessage(`⬇️ ${file.name} descargado`);
+        showToastMessage(`⬇️ ${file.name} guardado (descargado)`);
       }
 
       // ------------------------------------------------------------
-      // 10. EVENTOS Y ATALOS
+      // 11. EVENTOS Y ATALOS DE TECLADO
       // ------------------------------------------------------------
       splashOpenBtn.addEventListener('click', openFolder);
       openFolderBtn.addEventListener('click', openFolder);
